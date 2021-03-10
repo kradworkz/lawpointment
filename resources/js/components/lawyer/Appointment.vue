@@ -712,7 +712,7 @@
 
             axios.post(this.currentUrl+'/request/appointment/file/add', formData, config)
             .then(response => {
-               
+               this.getfiles(this.selectedappointment);
                this.f = false;
                $("#files").modal('hide');
             })
