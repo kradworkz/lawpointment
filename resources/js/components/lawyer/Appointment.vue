@@ -712,7 +712,9 @@
 
             axios.post(this.currentUrl+'/request/appointment/file/add', formData, config)
             .then(response => {
-                alert('File Uploaded');
+               
+               this.f = false;
+               $("#files").modal('hide');
             })
             .catch(function (error) {
                 currentObj.output = error;
