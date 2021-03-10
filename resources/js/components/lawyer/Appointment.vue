@@ -367,7 +367,7 @@
         <div class="modal fade" id="files" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="margin-top: 150px;"> 
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <form class="md-float-material form-material" ref="file" @submit.prevent="addfile" enctype="multipart/form-data" multiple>
+                    <form class="md-float-material form-material" ref="file" @submit.prevent="addfile" enctype="multipart/form-data">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Files</h5>
                         <button class="close" type="button" data-dismiss="modal" aria-label="Close">
@@ -395,7 +395,7 @@
                         <div v-else>
                             <div class="form-group row profile-edit-container">
                                 <div class="col-md-12">
-                                    <input type="file" @change="selectFile">
+                                    <input type="file" ref="file" multiple>
                                 </div>
                             </div>
                         </div>
@@ -696,15 +696,27 @@
             .catch(err => console.log(err));
         },
 
-        addfile(){
-            const data = new FormData();
-            data.append('file', this.file);
-            data.append('id', this.selectedappointment);
-            axios.post(this.currentUrl + '/request/appointment/file/add', data)
+        addfile(e){
+
+            e.preventDefault();
+            let currentObj = this;
+            const config = {
+                headers: { 'content-type': 'multipart/form-data' }
+            }
+            let formData = new FormData();
+            for( var i = 0; i < this.$refs.file.files.length; i++ ){
+                let file = this.$refs.file.files[i];
+                formData.append('files[' + i + ']', file);
+                formData.append('id', this.selectedappointment);
+            }
+
+            axios.post(this.currentUrl+'/request/appointment/file/add', formData, config)
             .then(response => {
-               this.f = false;
+                alert('File Uploaded');
             })
-            .catch(err => console.log(err));
+            .catch(function (error) {
+                currentObj.output = error;
+            });
         },
 
         appointmentstatus(status,id){

@@ -193,13 +193,27 @@ class LawyerController extends Controller
 
     public function file(Request $request){
 
-        $fileName = $request->file('file')->getClientOriginalName();
-        $request->file('file')->move(public_path('images/files'), $fileName);
+        $datas = $request->file('files');
+       
+        foreach ($datas as $data) {
+            $ext = $data->getClientOriginalExtension();
+            $org = $data->getClientOriginalName();
+            $fileName = pathinfo($org,PATHINFO_FILENAME).'_'.$request->input('id').'_'.date('Y-m-d').'.'.$ext;
+            $data->move(public_path('images/files'), $fileName);
 
-        $data = new File;
-        $data->file =$fileName;
-        $data->appointment_id = $request->input('id');
-        $data->save();
+            $data = new File;
+            $data->file =$fileName;
+            $data->appointment_id = $request->input('id');
+            $data->save();
+        }
+
+        // $fileName = $request->file->getClientOriginalName();
+        // $request->file->move(public_path('images/files'), $fileName);
+
+        // $data = new File;
+        // $data->file =$fileName;
+        // $data->appointment_id = $request->input('id');
+        // $data->save();
     
         return new DefaultResource($data);
 
