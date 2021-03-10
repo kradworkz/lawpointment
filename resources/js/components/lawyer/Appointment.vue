@@ -367,7 +367,7 @@
         <div class="modal fade" id="files" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="margin-top: 150px;"> 
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <form class="md-float-material form-material" ref="file" @submit.prevent="addfile" enctype="multipart/form-data">
+                   
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Files</h5>
                         <button class="close" type="button" data-dismiss="modal" aria-label="Close">
@@ -403,9 +403,10 @@
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
                         <button v-if="f==false" @click="f=true" type="button" class="btn btn-primary">Add File</button>
+                         <form class="md-float-material form-material" ref="file" @submit.prevent="addfile" enctype="multipart/form-data">
                         <button v-if="f==true" type="submit" class="btn btn-primary">Save File</button>
+                         </form>
                     </div>
-                    </form>
                 </div>
             </div>
         </div>
@@ -714,7 +715,7 @@
             .then(response => {
                this.getfiles(this.selectedappointment);
                this.f = false;
-               $("#files").modal('hide');
+               $("#files").appendTo("body").modal('hide');
             })
             .catch(function (error) {
                 currentObj.output = error;
