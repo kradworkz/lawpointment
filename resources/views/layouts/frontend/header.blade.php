@@ -28,6 +28,7 @@
 								
 								@if(Auth::check())
 								<notification :usertype="'{{ auth()->user()->type }}'"></notification> |
+								<li><a href="/myreports">Reports</a></li>|
 								@if(Auth::user()->type == 'Client')
 								<li><a href="/lawyers">Lawyers</a></li>|
 								<li><a href="/myappointments">Appointments</a></li>|

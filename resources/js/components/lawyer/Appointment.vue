@@ -295,7 +295,7 @@
                                     <th>Title</th>
                                     <th>Legal Practice</th>
                                     <th>Status</th>
-                                    <th>Booked Date</th>
+                                    <th>Scheduled Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -303,7 +303,7 @@
                                     <td>{{history.title}}</td>
                                     <td>{{history.legalpractice}}</td>
                                     <td>{{history.status}}</td>
-                                    <td>{{history.created_at}}</td>
+                                    <td>{{history.scheduled_at}}</td>
                                 </tr>
                             </tbody>
                         </table>

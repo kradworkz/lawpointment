@@ -26,6 +26,7 @@ Route::get('/lawyer/{id}', 'PageController@publawyer');
 Route::middleware('auth')->group(function () {
    
     Route::get('/settings', 'PageController@settings');  
+    Route::get('/myreports', 'PageController@myreports');  
 
 });
 
@@ -139,4 +140,7 @@ Route::prefix('request')->group(function () {
     // Route::post('/appointment/restatus', 'AppointmentController@restatus');
     // Route::post('/appointment/resched', 'AppointmentController@resched');
     // Route::post('/appointment/declined', 'AppointmentController@declined');
+
+    Route::get('/myreports/{type}', 'ReportController@index');
+    Route::get('/myreports/insights/{type}', 'ReportController@insights');
 });

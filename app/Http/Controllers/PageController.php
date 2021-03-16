@@ -66,5 +66,10 @@ class PageController extends Controller
     {
         return view('settings');
     }
+
+    public function myreports()
+    {
+        return view('myreports');
+    }
    
 }

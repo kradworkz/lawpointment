@@ -9,9 +9,10 @@ require('./bootstrap');
 window.Vue = require('vue');
 import VueToast from 'vue-toast-notification';
 Vue.use(VueToast);
-import ToggleButton from 'vue-js-toggle-button'
- 
-Vue.use(ToggleButton)
+import ToggleButton from 'vue-js-toggle-button';
+import VueHtml2pdf from 'vue-html2pdf';
+Vue.use(VueHtml2pdf);
+Vue.use(ToggleButton);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -45,6 +46,7 @@ Vue.component('appointment', require('./components/Appointment.vue').default);
 Vue.component('home', require('./components/Home.vue').default);
 
 Vue.component('home-client', require('./components/HomeClient.vue').default);
+Vue.component('myreports', require('./components/Myreport.vue').default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

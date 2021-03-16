@@ -19,6 +19,7 @@ class HistoryResource extends JsonResource
             'status' => $this->status,
             'legalpractice' => $this->legalpractice->name,
             'created_at' => $this->created_at,
+            'scheduled_at' =>($this->schedule() != NULL) ? $this->schedule()->date : 'n/a',
         ];
     }
 }
