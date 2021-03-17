@@ -10,8 +10,6 @@ window.Vue = require('vue');
 import VueToast from 'vue-toast-notification';
 Vue.use(VueToast);
 import ToggleButton from 'vue-js-toggle-button';
-import VueHtml2pdf from 'vue-html2pdf';
-Vue.use(VueHtml2pdf);
 Vue.use(ToggleButton);
 /**
  * The following block of code may be used to automatically register your

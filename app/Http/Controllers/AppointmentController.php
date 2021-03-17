@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Profile;
 use App\Models\Appointment;
 use App\Models\Schedule;
 use App\Models\LawyerAppointment;
@@ -307,16 +308,17 @@ class AppointmentController extends Controller
 
         // $data = LawyerAppointment::where('lawyer_id',$user_id)->orderBy('id','DESC')->paginate(5);
         // $data = Appointment::where('client_id',$user_id)->where('title', 'LIKE', '%'.$keyword.'%')->where('status',$status)->paginate(5);
-        
+        $ids = Profile::where('firstname','LIKE', '%'.$keyword.'%')->orWhere('lastname','LIKE', '%'.$keyword.'%')->pluck('id');
+
         $data =  LawyerAppointment::where('lawyer_id',$user_id)->where('status','!=','Declined')->orderBy('id','DESC')
-        ->whereHas('appointment',function($query) use ($keyword,$status) {
-            return $query->where('title', 'LIKE', '%'.$keyword.'%')
-            ->where('status','LIKE', '%'.$status.'%');
+        ->whereHas('appointment',function($query) use ($ids) {
+            return $query->whereIn('client_id',$ids);
         })
         ->pluck('appointment_id');
 
         if($from != '' && $to != ''){
-            $apps = Appointment::whereIn('id',$data)->whereBetween('created_at',[$from,$to])->paginate(8);
+            $apps = Appointment::whereIn('id',$data)
+            ->whereBetween('created_at',[$from,$to])->paginate(8);
         }else{
             $apps = Appointment::whereIn('id',$data)->paginate(8);
         }

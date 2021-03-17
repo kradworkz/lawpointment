@@ -73,7 +73,7 @@
                                                         <label v-else class="label label-md label-warning">Not Available</label>
                                                     </td>
                                                     <td>
-                                                        <a><i class="icon feather icon-eye f-w-600 f-16 m-r-15 text-c-blue" data-modal="modal-1"></i></a>
+                                                        <!-- <a><i class="icon feather icon-eye f-w-600 f-16 m-r-15 text-c-blue" data-modal="modal-1"></i></a> -->
                                                         <a @click="edituser(user)"><i class="icon feather icon-edit f-w-600 f-16 m-r-15 text-c-green"></i></a>
                                                     </td>
                                                 </tr> 

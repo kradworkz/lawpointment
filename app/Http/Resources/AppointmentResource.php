@@ -27,7 +27,9 @@ class AppointmentResource extends JsonResource
             'lawyer_name' => ($this->lawyer()) ? 'Atty. '.$this->lawyer()->lawyer->profile->firstname.' '.$this->lawyer()->lawyer->profile->lastname : 'N/A',
             'lawyer_avatar' =>($this->lawyer()) ?  $this->lawyer()->lawyer->profile->avatar : 'N/A',
             'lawyer_status' => ($this->lawyer()) ? $this->lawyer()->status : 'N/A',
-            'lawyers' => ($this->lawyers) ? $this->lawyers : 'N/A'
+            'lawyers' => ($this->lawyers) ? $this->lawyers : 'N/A',
+            'notes' => $this->notes,
+            'files' => $this->files
         ];
     }
 }

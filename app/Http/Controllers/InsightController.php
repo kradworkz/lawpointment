@@ -12,11 +12,14 @@ use App\Http\Resources\TopResource;
 
 class InsightController extends Controller
 {
-    public function index($type)
+    public function index(Request $request)
     {   
         $array = [];
         $date = Carbon::now()->format( 'Y-m-d' );
         $user_id =  \Auth::user()->id;
+        $type = $request->input('selected');
+        $month = ($request->input('month') == '') ? date('m') : $request->input('month');
+        $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
 
         if($type == 'Daily')
         {
@@ -121,15 +124,15 @@ class InsightController extends Controller
 
         }else if($type == 'Monthly'){
 
-            $prods1 = Appointment::where('is_walkin',1)->where('status','Finished')->whereMonth('created_at',date('m'))->count();
-            $prods2 = Appointment::where('is_walkin',0)->where('status','Finished')->whereMonth('created_at',date('m'))->count();
-            $prods3 = User::where('type','Client')->whereMonth('created_at',date('m'))->count();
+            $prods1 = Appointment::where('is_walkin',1)->where('status','Finished')->whereMonth('created_at',$month)->count();
+            $prods2 = Appointment::where('is_walkin',0)->where('status','Finished')->whereMonth('created_at',$month)->count();
+            $prods3 = User::where('type','Client')->whereMonth('created_at',$month)->count();
 
 
             $prods4 =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->where('is_walkin',1)
-            ->whereMonth('created_at',date('m'))
+            ->whereMonth('created_at',$month)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(1)
@@ -139,7 +142,7 @@ class InsightController extends Controller
             $prods5 =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->where('is_walkin',0)
-            ->whereMonth('created_at',date('m'))
+            ->whereMonth('created_at',$month)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(1)
@@ -147,8 +150,8 @@ class InsightController extends Controller
             $prods5 = (!empty($prods5[0])) ? $prods5[0]->legalpractice->name: 'None';
 
             $prods6 =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
-            ->whereHas('appointment',function($query) use ($date){
-                $query->where('status','Finished')->whereMonth('created_at',date('m'));
+            ->whereHas('appointment',function($query) use ($month){
+                $query->where('status','Finished')->whereMonth('created_at',$month);
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
@@ -160,14 +163,14 @@ class InsightController extends Controller
             $date = 'Month of '.Carbon::now()->format('F');
         }else{
 
-            $prods1 = Appointment::where('is_walkin',1)->where('status','Finished')->whereYear('created_at',date('Y'))->count();
-            $prods2 = Appointment::where('is_walkin',0)->where('status','Finished')->whereYear('created_at',date('Y'))->count();
-            $prods3 = User::where('type','Client')->whereYear('created_at',date('Y'))->count();
+            $prods1 = Appointment::where('is_walkin',1)->where('status','Finished')->whereYear('created_at',$year)->count();
+            $prods2 = Appointment::where('is_walkin',0)->where('status','Finished')->whereYear('created_at',$year)->count();
+            $prods3 = User::where('type','Client')->whereYear('created_at',$year)->count();
 
             $prods4 =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->where('is_walkin',1)
-            ->whereYear('created_at',date('Y'))
+            ->whereYear('created_at',$year)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(1)
@@ -177,7 +180,7 @@ class InsightController extends Controller
             $prods5 =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->where('is_walkin',0)
-            ->whereYear('created_at',date('Y'))
+            ->whereYear('created_at',$year)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(1)
@@ -186,8 +189,8 @@ class InsightController extends Controller
 
 
             $prods6 =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
-            ->whereHas('appointment',function($query) use ($date){
-                $query->where('status','Finished')->whereYear('created_at',date('Y'));
+            ->whereHas('appointment',function($query) use ($year){
+                $query->where('status','Finished')->whereYear('created_at',$year);
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
@@ -212,10 +215,13 @@ class InsightController extends Controller
         return $dataSet;
     }
 
-    public function report($type){
+    public function report(Request $request){
         $array = [];
         $date = Carbon::now()->format( 'Y-m-d' );
         $user_id =  \Auth::user()->id;
+        $type = $request->input('selected');
+        $month = ($request->input('month') == '') ? date('m') : $request->input('month');
+        $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
 
         if($type == 'Daily')
         {
@@ -248,7 +254,7 @@ class InsightController extends Controller
 
             $data =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
-            ->whereMonth('created_at',date('m'))
+            ->whereMonth('created_at',$month)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(5)
@@ -260,7 +266,7 @@ class InsightController extends Controller
         
             $data =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
-            ->whereYear('created_at',date('Y'))
+            ->whereYear('created_at',$year)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(5)
@@ -273,10 +279,13 @@ class InsightController extends Controller
 
     }
 
-    public function report2($type){
+    public function report2(Request $request){
         $array = [];
         $date = Carbon::now()->format( 'Y-m-d' );
         $user_id =  \Auth::user()->id;
+        $type = $request->input('selected');
+        $month = ($request->input('month') == '') ? date('m') : $request->input('month');
+        $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
 
         if($type == 'Daily')
         {
@@ -312,8 +321,8 @@ class InsightController extends Controller
         }else if($type == 'Monthly'){
 
             $data =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
-            ->whereHas('appointment',function($query) use ($date){
-                $query->where('status','Finished')->whereMonth('created_at',date('m'));
+            ->whereHas('appointment',function($query) use ($month){
+                $query->where('status','Finished')->whereMonth('created_at',$month);
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
@@ -325,8 +334,8 @@ class InsightController extends Controller
         }else{
 
             $data =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
-            ->whereHas('appointment',function($query) use ($date){
-                $query->where('status','Finished') ->whereYear('created_at',date('Y'));
+            ->whereHas('appointment',function($query) use ($year){
+                $query->where('status','Finished')->whereYear('created_at',$year);
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')

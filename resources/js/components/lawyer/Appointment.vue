@@ -19,7 +19,7 @@
                         <div class="search_bar_list">
                             <input type="submit" value="Search">
                             <input type="text" @keyup="search" v-model="keyword" class="form-control"
-                                placeholder="Enter Title">
+                                placeholder="Enter Client">
                         </div>
                     </div>
                     <div class="col-md-6">

@@ -12,7 +12,11 @@ use App\Http\Resources\ReportResource;
 
 class ReportController extends Controller
 {
-    public function index($type){
+    public function index(Request $request){
+
+        $type = $request->input('selected');
+        $month = ($request->input('month') == '') ? date('m') : $request->input('month');
+        $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
 
         if(Auth::user()->type == 'Lawyer'){
             $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
@@ -30,9 +34,9 @@ class ReportController extends Controller
         }else if($type == 'Weekly'){
             $query =  $query->whereBetween('created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
         }else if($type == 'Monthly'){
-            $query = $query->whereMonth('created_at',date('m'));
+            $query = $query->whereMonth('created_at',$month);
         }else{
-            $query = $query->whereYear('created_at',date('Y'));
+            $query = $query->whereYear('created_at',$year);
         }
 
         $data = $query->get();
@@ -41,11 +45,15 @@ class ReportController extends Controller
     }
 
 
-    public function insights($type){
+    public function insights(Request $request){
         
             $array = [];
             $date = Carbon::now()->format( 'Y-m-d' );
             $user_id =  \Auth::user()->id;
+            $month = ($request->input('month') == '') ? date('m') : $request->input('month');
+            $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
+            $type = $request->input('selected');
+
     
             if($type == 'Daily')
             {   
@@ -161,15 +169,15 @@ class ReportController extends Controller
                 })->pluck('id');
                 
 
-                $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->where('status','Finished')->whereMonth('created_at',date('m'))->count();
-                $prods2 = Appointment::whereIn('id',$ids)->where('is_walkin',0)->where('status','Finished')->whereMonth('created_at',date('m'))->count();
-                $prods3 =  Appointment::whereIn('id',$ids)->whereMonth('created_at',date('m'))->groupBy('client_id')->count();
+                $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->where('status','Finished')->whereMonth('created_at',$month)->count();
+                $prods2 = Appointment::whereIn('id',$ids)->where('is_walkin',0)->where('status','Finished')->whereMonth('created_at',$month)->count();
+                $prods3 =  Appointment::whereIn('id',$ids)->whereMonth('created_at',$month)->groupBy('client_id')->count();
     
     
                 $prods4 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('status','Finished') 
                 ->where('is_walkin',1)
-                ->whereMonth('created_at',date('m'))
+                ->whereMonth('created_at',$month)
                 ->groupBy('legalpractice_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -179,7 +187,7 @@ class ReportController extends Controller
                 $prods5 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('status','Finished') 
                 ->where('is_walkin',0)
-                ->whereMonth('created_at',date('m'))
+                ->whereMonth('created_at',$month)
                 ->groupBy('legalpractice_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -187,7 +195,7 @@ class ReportController extends Controller
                 $prods5 = (!empty($prods5[0])) ? $prods5[0]->legalpractice->name: 'None';
     
                 $prods6 =  Appointment::whereIn('id',$ids)->select('client_id',\DB::raw("count(*) as count"))
-                ->whereMonth('created_at',date('m'))
+                ->whereMonth('created_at',$month)
                 ->groupBy('client_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -203,14 +211,14 @@ class ReportController extends Controller
                     return $query->where('lawyer_id', Auth::user()->id);
                 })->pluck('id');
     
-                $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->where('status','Finished')->whereYear('created_at',date('Y'))->count();
-                $prods2 = Appointment::whereIn('id',$ids)->where('is_walkin',0)->where('status','Finished')->whereYear('created_at',date('Y'))->count();
-                $prods3 =  Appointment::whereIn('id',$ids)->whereYear('created_at',date('Y'))->groupBy('client_id')->count();
+                $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->where('status','Finished')->whereYear('created_at',$year)->count();
+                $prods2 = Appointment::whereIn('id',$ids)->where('is_walkin',0)->where('status','Finished')->whereYear('created_at',$year)->count();
+                $prods3 =  Appointment::whereIn('id',$ids)->whereYear('created_at',$year)->groupBy('client_id')->count();
     
                 $prods4 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('status','Finished') 
                 ->where('is_walkin',1)
-                ->whereYear('created_at',date('Y'))
+                ->whereYear('created_at',$year)
                 ->groupBy('legalpractice_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -220,7 +228,7 @@ class ReportController extends Controller
                 $prods5 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('status','Finished') 
                 ->where('is_walkin',0)
-                ->whereYear('created_at',date('Y'))
+                ->whereYear('created_at',$year)
                 ->groupBy('legalpractice_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -229,7 +237,7 @@ class ReportController extends Controller
     
     
                 $prods6 =  Appointment::whereIn('id',$ids)->select('client_id',\DB::raw("count(*) as count"))
-                ->whereYear('created_at',date('Y'))
+                ->whereYear('created_at',$year)
                 ->groupBy('client_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -251,6 +259,31 @@ class ReportController extends Controller
                 'def' => $definition
             ];
             return $dataSet;
+        }
+
+        public function reports(Request $request){
+
+            $type = $request->input('selected');
+            $month = ($request->input('month') == '') ? date('m') : $request->input('month');
+            $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
+
+    
+            $query = Appointment::query();
+            $query = $query->where('status','Finished');
+            
+            if($type == 'Daily'){
+                $query = $query->whereDate('created_at',date('Y-m-d'));
+            }else if($type == 'Weekly'){
+                $query =  $query->whereBetween('created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
+            }else if($type == 'Monthly'){
+                $query = $query->whereMonth('created_at',$month);
+            }else{
+                $query = $query->whereYear('created_at',$year);
+            }
+    
+            $data = $query->get();
+    
+            return ReportResource::collection($data);
         }
         
     

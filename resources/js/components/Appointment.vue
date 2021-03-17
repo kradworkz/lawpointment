@@ -25,7 +25,8 @@
                                 <li class="nav-item mail-section" @click="withhout">
                                     <a class="nav-link waves-effect d-block" data-toggle="pill" href="#e-starred"
                                         role="tab">
-                                        <i class="icofont icofont-star"></i> Without Lawyer <span class="label label-primary float-right">{{count}}</span>
+                                        <i class="icofont icofont-star"></i> Without Lawyer <span
+                                            class="label label-primary float-right">{{count}}</span>
                                     </a>
                                 </li>
                                 <li class="nav-item mail-section" @click="withh">
@@ -33,7 +34,7 @@
                                         <i class="icofont icofont-inbox"></i> With Lawyer
                                     </a>
                                 </li>
-                               
+
                             </ul>
                         </div>
                     </div>
@@ -43,7 +44,7 @@
                 <div class="card">
                     <div class="card-block email-card">
                         <div class="row">
-                            <div  class="col-md-4" style="float:left; width: 350px;">
+                            <div class="col-md-4" style="float:left; width: 350px;">
                                 <form>
                                     <div class="material-group">
                                         <div class="input-group">
@@ -51,7 +52,8 @@
                                                 <label class="input-group-text "><i
                                                         class="icofont icofont-search"></i></label>
                                             </span>
-                                            <input type="text" class="form-control" placeholder="Search" v-model="keyword" @keyup="search">
+                                            <input type="text" class="form-control" placeholder="Search"
+                                                v-model="keyword" @keyup="search">
                                         </div>
                                     </div>
                                 </form>
@@ -61,17 +63,20 @@
                                 <div class="row">
                                     <div class="col-md-5">
                                         <div class="custom-form no-icons">
-                                            <input type="date" v-model="from" placeholder="Date Example : 09/12/2019" class="form-control fill">
+                                            <input type="date" v-model="from" placeholder="Date Example : 09/12/2019"
+                                                class="form-control fill">
                                         </div>
                                     </div>
                                     <div class="col-md-5">
                                         <div class="custom-form no-icons">
-                                            <input type="date" v-model="to" placeholder="Date Example : 09/12/2019" class="form-control fill">
+                                            <input type="date" v-model="to" placeholder="Date Example : 09/12/2019"
+                                                class="form-control fill">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
-                                    <multiselect v-model="status" :options="options" placeholder="Select Status" :show-labels="false" @input="onChange">
-                                    </multiselect>
+                                        <multiselect v-model="status" :options="options" placeholder="Select Status"
+                                            :show-labels="false" @input="onChange">
+                                        </multiselect>
                                     </div>
                                 </div>
                             </div>
@@ -88,23 +93,30 @@
                                                     <th>Title</th>
                                                     <th>Booking Date</th>
                                                     <th>Scheduled at</th>
-                                                     <th>Status</th>
+                                                    <th>Status</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr v-for="appointment in appointments" v-bind:key="appointment.id">
-                                                    <td><a class="email-name waves-effect">{{appointment.client}}</a></td>
-                                                    <td><a class="email-name waves-effect">{{appointment.lawyer_name}}</a></td>
-                                                    <td><a class="email-name waves-effect">{{appointment.title}}</a></td>
+                                                    <td><a class="email-name waves-effect">{{appointment.client}}</a>
+                                                    </td>
+                                                    <td><a
+                                                            class="email-name waves-effect">{{appointment.lawyer_name}}</a>
+                                                    </td>
+                                                    <td><a class="email-name waves-effect">{{appointment.title}}</a>
+                                                    </td>
                                                     <td style="font-size: 12px;">{{appointment.created_at}}</td>
                                                     <td style="font-size: 12px;">{{appointment.scheduled_at}}</td>
-                                                     <td>
+                                                    <td>
                                                         <span v-if="appointment.status == 'Pending'">
-                                                            <label v-if="appointment.legalpractice != 'No Legal Practice'" class="label label-md label-warning">Pending</label>
-                                                            <label v-else class="label label-md label-danger" @click="set(appointment.id)">Set Attorney</label>
+                                                            <label
+                                                                v-if="appointment.legalpractice != 'No Legal Practice'"
+                                                                class="label label-md label-warning">Pending</label>
+                                                            <label v-else class="label label-md label-danger"
+                                                                @click="set(appointment.id)">Set Attorney</label>
                                                         </span>
-                                                            
+
                                                         <label v-else-if="appointment.status == 'Accepted'"
                                                             class="label label-md label-info">Accepted</label>
                                                         <label v-else-if="appointment.status == 'Cancelled'"
@@ -294,7 +306,7 @@
                                 </button>
                             </div>
 
-                            <div class="modal-body">
+                            <div class="modal-body" v-if="n == false && f == false">
                                 <div class="card-block">
                                     <div class="row">
                                         <div class="col-4">
@@ -316,9 +328,30 @@
                                     <h5>{{app.title}}</h5>
                                     <p>{{app.details}}</p>
                                 </div>
+                                <hr>
+                                <button type="button" class="btn btn-default waves-effect" @click="opennotes(app.notes)"> Notes</button>
+                                <button type="button" class="btn btn-default waves-effect"  @click="openfiles(app.files)"> Files</button>
+                            </div>
+                            <div class="modal-body" v-if="n == true"> 
+                                 <ul class="basic-list">
+                                    <li class="" v-for="note in notes" v-bind:key="note.id">
+                                        <h6>{{note.created_at}}</h6>
+                                        <p>{{note.note}}</p>
+                                    </li>
+                                </ul>
+                            </div>
+                             <div class="modal-body" v-if="f == true"> 
+                                 <ul class="basic-list">
+                                    <li class="" v-for="file in files" v-bind:key="file.id">
+                                        <h6>{{file.created_at}}</h6>
+                                        <a :href="currentUrl+'/images/files/'+file.file" target="_blank">{{file.file}}</a>
+                                    </li>
+                                </ul>
                             </div>
 
+
                             <div class="modal-footer">
+                                 <button v-if="n == true || f == true" type="button" class="btn btn-warning waves-effect" @click="backk">Back</button>
                                 <button type="button" class="btn btn-default waves-effect "
                                     data-dismiss="modal">Close</button>
                             </div>
@@ -326,6 +359,11 @@
                     </div>
                 </div>
             </div>
+
+            
+
+
+
 
         </div>
     </div>
@@ -354,20 +392,24 @@
                 app: '',
                 type: 'walkin',
                 count: '',
-                options: ['All','Pending', 'Accepted', 'Finished', 'Cancelled'],
+                options: ['All', 'Pending', 'Accepted', 'Finished', 'Cancelled'],
                 status: 'All',
                 from: '',
-                to:''
+                to: '',
+                notes: [],
+                files: [],
+                n : false,
+                f : false
             }
         },
 
         watch: {
-            from: function(){
-                (this.to != '' && this.from != '') ? this.search() : '';
+            from: function () {
+                (this.to != '' && this.from != '') ? this.search(): '';
             },
 
-            to: function(){
-                (this.to != '' && this.from != '') ? this.search() : '';
+            to: function () {
+                (this.to != '' && this.from != '') ? this.search(): '';
             }
         },
 
@@ -390,17 +432,24 @@
                 this.pagination = pagination;
             },
 
-            nameWithLang ({ firstname, lastname, numberofapp }) {
+            nameWithLang({
+                firstname,
+                lastname,
+                numberofapp
+            }) {
                 return `${firstname} ${lastname} | Appointments : ${numberofapp}`;
             },
-            
-            nameWithLang2 ({ firstname, lastname }) {
+
+            nameWithLang2({
+                firstname,
+                lastname
+            }) {
                 return `${firstname} ${lastname}`;
             },
 
             fetch(page_url) {
                 let vm = this;
-                page_url = page_url || this.currentUrl + '/request/appointments/lists/'+this.type;
+                page_url = page_url || this.currentUrl + '/request/appointments/lists/' + this.type;
 
                 axios.get(page_url)
                     .then(response => {
@@ -457,59 +506,59 @@
 
             setAppointment() {
                 axios.post(this.currentUrl + '/request/appointment/walkin', {
-                    legalpractice: this.legalpractice.id,
-                    lawyer: this.lawyer.id,
-                    client: this.client.id,
-                    title: this.title,
-                    details: this.details
-                })
-                .then(response => {
-                    this.fetch();
-                    this.clear();
-                })
-                .catch(error => {
-                    if (error.response.status == 422) {
-                        this.errors = error.response.data.errors;
-                    }
-                });
+                        legalpractice: this.legalpractice.id,
+                        lawyer: this.lawyer.id,
+                        client: this.client.id,
+                        title: this.title,
+                        details: this.details
+                    })
+                    .then(response => {
+                        this.fetch();
+                        this.clear();
+                    })
+                    .catch(error => {
+                        if (error.response.status == 422) {
+                            this.errors = error.response.data.errors;
+                        }
+                    });
             },
 
             setLawyer() {
                 axios.post(this.currentUrl + '/request/appointment/setatty', {
-                    id: this.appointment,
-                    lawyer: this.lawyer.id,
-                    legalpractice: this.legalpractice.id,
-                })
-                .then(response => {
-                    this.fetch();
-                    this.clear();
-                    $('#set').modal('hide');
-                })
-                .catch(error => {
-                    if (error.response.status == 422) {
-                        this.errors = error.response.data.errors;
-                    }
-                });
+                        id: this.appointment,
+                        lawyer: this.lawyer.id,
+                        legalpractice: this.legalpractice.id,
+                    })
+                    .then(response => {
+                        this.fetch();
+                        this.clear();
+                        $('#set').modal('hide');
+                    })
+                    .catch(error => {
+                        if (error.response.status == 422) {
+                            this.errors = error.response.data.errors;
+                        }
+                    });
             },
 
             search() {
                 let vm = this;
                 axios.post(this.currentUrl + '/request/appointment/search', {
-                    word: this.keyword,
-                    type: this.type,
-                    from: this.from,
-                    to: this.to,
-                    status: this.status
-                })
-                .then(response => {
-                    this.appointments = response.data.data;;
-                    vm.makePagination(response.data.meta, response.data.links);
-                })
-                .catch(error => {
-                    if (error.response.status == 422) {
-                        this.errors = error.response.data.errors;
-                    }
-                });
+                        word: this.keyword,
+                        type: this.type,
+                        from: this.from,
+                        to: this.to,
+                        status: this.status
+                    })
+                    .then(response => {
+                        this.appointments = response.data.data;;
+                        vm.makePagination(response.data.meta, response.data.links);
+                    })
+                    .catch(error => {
+                        if (error.response.status == 422) {
+                            this.errors = error.response.data.errors;
+                        }
+                    });
             },
 
             clear() {
@@ -552,9 +601,27 @@
                 $('#viewapp').modal('show');
             },
 
-            onChange(){
+            onChange() {
                 this.search();
+            },
+
+            opennotes(notes){
+                this.n = true;
+                this.f = false;
+                this.notes = notes;
+            },
+
+            openfiles(files){
+                this.n = false;
+                this.f = true;
+                this.files = files;
+            },
+
+            backk(){
+                this.n = false;
+                this.f = false;
             }
+
         },
 
         components: {

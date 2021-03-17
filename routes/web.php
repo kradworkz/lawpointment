@@ -102,9 +102,9 @@ Route::prefix('request')->group(function () {
 
     //Reports -------------------------------
 
-    Route::get('insights/{type}', 'InsightController@index');
-    Route::get('reports/{type}', 'InsightController@report');
-    Route::get('reports2/{type}', 'InsightController@report2');
+    Route::post('insights', 'InsightController@index');
+    Route::post('reports', 'InsightController@report');
+    Route::post('reports2', 'InsightController@report2');
 
 
     //Calendar ------------------------------
@@ -141,6 +141,7 @@ Route::prefix('request')->group(function () {
     // Route::post('/appointment/resched', 'AppointmentController@resched');
     // Route::post('/appointment/declined', 'AppointmentController@declined');
 
-    Route::get('/myreports/{type}', 'ReportController@index');
-    Route::get('/myreports/insights/{type}', 'ReportController@insights');
+    Route::post('/myreports', 'ReportController@index');
+    Route::post('/myreports/insights', 'ReportController@insights');
+    Route::post('/myreportss', 'ReportController@reports');
 });
