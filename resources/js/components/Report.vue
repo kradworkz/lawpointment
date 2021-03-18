@@ -78,8 +78,16 @@
                                         </div>
                                     </div>
                                 </div>
+                                 <div class="col-md-6">
+                                   <button v-if="show == false" class="btn btn-primary" @click="generateReport" style="float: right;">Print</button>
+                                   <button v-else class="btn btn-primary" @click="generateReport2" style="float: right;">Print</button>
+                                 </div>
                             </div>
-                            <div v-if="show == false">
+                            <div v-if="show == false" ref="html2Pdf">
+                                <div class="row">
+                                    <h5>Insights (<span v-if="selected == 'Daily' || selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                <br>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-4 ins" v-for="(insight,index) in ins.title" v-bind:key="insight.id">
                                         <b style="font-weight: bold; font-size: 14px;">{{insight}}</b>
@@ -117,7 +125,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else>
+                            <div v-else ref="html2Pdf2">
+                                 <h5>List of Appointments (<span v-if="selected == 'Daily' || selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5><br>
                                     <table class="table table-striped" style="min-width: 100%; ">
                                         <thead>
                                             <tr>
@@ -154,6 +163,7 @@
 </template>
 
 <script>
+import html2PDF from 'jspdf-html2canvas';
 export default {
     data() {
         return {
@@ -167,8 +177,9 @@ export default {
             legals : [],
             selected : 'Weekly',
             show : false,
-            month: '',
-            yearr: ''
+            month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
+            yearr: new Date().getFullYear(),
+            months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         }
     },
 
@@ -180,14 +191,7 @@ export default {
 
     methods : {
         type(){
-            
-              if(this.selected != 'Monthly'){
-                this.month = '';
-            }
-
-            if(this.selected != 'Yearly'){
-                this.year = '';
-            }
+        
             if(this.show == true){
                 this.fetch();
             }else{
@@ -252,8 +256,28 @@ export default {
         report(){
             this.show = true;
             this.fetch();
+        },
+         
+        generateReport () {
+            html2PDF(this.$refs.html2Pdf, {
+                margin: {right : .5, left: .5, top: .5},
+                output: this.yearr+'_'+this.month+'_'+this.selected+'.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 4, dpi: 192, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
+            })
+        },
+
+         generateReport2 () {
+            html2PDF(this.$refs.html2Pdf2, {
+                margin: {right : .5, left: .5, top: .5},
+                output: this.yearr+'_'+this.month+'_'+this.selected+'.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 4, dpi: 192, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
+            })
         }
-    }
+    }, components : { html2PDF}
 }
 </script>
 

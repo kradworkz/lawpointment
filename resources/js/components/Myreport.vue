@@ -72,7 +72,7 @@
                                         </div>
                                     </div><br>
                                 <div class="col-md-12" ref="html2Pdf">
-                                    <div class="row">
+                                    <div class="row" v-if="user == 'Lawyer'">
                                         <h5>Insights (<span v-if="selected == 'Daily' || selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                     </div>
                                     

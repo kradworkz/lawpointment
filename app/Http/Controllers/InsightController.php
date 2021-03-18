@@ -159,8 +159,9 @@ class InsightController extends Controller
             ->get();
 
             $prods6 = (!empty($prods6[0])) ? $prods6[0]->lawyer->profile->firstname.' '.$prods6[0]->lawyer->profile->lastname : 'None';
-           
-            $date = 'Month of '.Carbon::now()->format('F');
+            
+            $monthName = date('F', mktime(0, 0, 0, $month, 10));
+            $date = 'Month of '.$monthName;
         }else{
 
             $prods1 = Appointment::where('is_walkin',1)->where('status','Finished')->whereYear('created_at',$year)->count();
