@@ -27,6 +27,7 @@ class LawyerRequest extends FormRequest
             'firstname' => 'required|max:100',
             'lastname' => 'required|max:100',
             'birthday' => 'required',
+            'address' => 'required',
             'specialization' => 'required',
             'gender' => 'required|max:100',
             'email' => 'required|string|max:150|unique:users,email,'.$this->id,

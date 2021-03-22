@@ -152,8 +152,7 @@ class ClientController extends Controller
 
         $users =  User::where('type','Client')
             ->whereHas('profile',function($query) use ($keyword) {
-            return $query->where('firstname', 'LIKE', '%'.$keyword.'%')
-            ->orWhere('lastname','like','%'.$keyword.'%');
+            return $query->where(\DB::raw('concat(firstname," ",lastname)'), 'LIKE', '%'.$keyword.'%');
         })->paginate(8);
     
         return ClientResource::collection($users);

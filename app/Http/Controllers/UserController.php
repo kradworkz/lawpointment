@@ -142,12 +142,15 @@ class UserController extends Controller
         $keyword = $request->input('word');
         $type = $request->input('type');
 
-        $users =  User::where('type','Lawyer')->where('status','Active')->with('profile')->whereHas('profile',function($query) use ($keyword) {
+        $ids = LawyerLegalpractice::where('legalpractice_id',$type)->orderBy('type','DESC')->pluck('user_id')->toArray();
+        $ids_ordered = implode(',', $ids);
+
+
+        $users =  User::whereIn('id',$ids)->where('status','Active')->with('profile')->whereHas('profile',function($query) use ($keyword) {
             return $query->where('firstname', 'LIKE', '%'.$keyword.'%')
             ->orWhere('lastname','like','%'.$keyword.'%');
-        })->whereHas('legalpractices',function($query) use ($type) {
-            return $query->where('legalpractice_id','LIKE','%'.$type.'%');
-        })->paginate(5);
+        })
+        ->orderByRaw("FIELD(id, $ids_ordered)")->paginate(5);
         
 
         // $users1 =  User::where('type','Lawyer')->with('profile')->whereHas('profile',function($query) use ($keyword) {

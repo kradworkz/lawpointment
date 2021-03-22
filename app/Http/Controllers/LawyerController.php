@@ -153,11 +153,11 @@ class LawyerController extends Controller
     public function search(Request $request){
 
         $keyword = $request->input('word');
+        // $ids = Profile::where(\DB::raw('concat(firstname," ",lastname)'),'LIKE', '%'.$keyword.'%')->pluck('user_id');
 
         $users =  User::where('type','Lawyer')
             ->whereHas('profile',function($query) use ($keyword) {
-            return $query->where('firstname', 'LIKE', '%'.$keyword.'%')
-            ->orWhere('lastname','like','%'.$keyword.'%');
+            return $query->where(\DB::raw('concat(firstname," ",lastname)'), 'LIKE', '%'.$keyword.'%');
         })->paginate(8);
     
         return LawyerResource::collection($users);

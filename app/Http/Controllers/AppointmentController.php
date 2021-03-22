@@ -43,23 +43,26 @@ class AppointmentController extends Controller
         $to = ($request->input('to') == '') ? '' : Carbon::parse($request->input('to'))->startOfDay(); 
         $from =($request->input('from') == '') ? '' : Carbon::parse($request->input('from'))->startOfDay();
 
+        $ids = Profile::where(\DB::raw('concat(firstname," ",lastname)'),'LIKE', '%'.$keyword.'%')->pluck('user_id');
+
+
         if($type == 'with'){
             if($status == 'All'){
-                $data = Appointment::where('title','LIKE', '%'.$keyword.'%')->where('legalpractice_id', '!=',1)->orderBy('id','DESC')->pluck('id');
+                $data = Appointment::whereIn('client_id',$ids)->where('legalpractice_id', '!=',1)->orderBy('id','DESC')->pluck('id');
             }else{
-                $data = Appointment::where('title','LIKE', '%'.$keyword.'%')->where('status',$status)->where('legalpractice_id', '!=',1)->orderBy('id','DESC')->pluck('id');
+                $data = Appointment::whereIn('client_id',$ids)->where('status',$status)->where('legalpractice_id', '!=',1)->orderBy('id','DESC')->pluck('id');
             }
         }else if($type == 'without'){
             if($status == 'All'){
-                $data = Appointment::where('title','LIKE', '%'.$keyword.'%')->where('legalpractice_id',1)->orderBy('id','DESC')->pluck('id');
+                $data = Appointment::whereIn('client_id',$ids)->where('legalpractice_id',1)->orderBy('id','DESC')->pluck('id');
             }else{
-                $data = Appointment::where('title','LIKE', '%'.$keyword.'%')->where('status',$status)->where('legalpractice_id',1)->orderBy('id','DESC')->pluck('id');
+                $data = Appointment::whereIn('client_id',$ids)->where('status',$status)->where('legalpractice_id',1)->orderBy('id','DESC')->pluck('id');
             }
         }else{
             if($status == 'All'){
-                $data = Appointment::where('title','LIKE', '%'.$keyword.'%')->where('is_walkin',0)->orderBy('id','DESC')->pluck('id');
+                $data = Appointment::whereIn('client_id',$ids)->where('is_walkin',0)->orderBy('id','DESC')->pluck('id');
             }else{
-                $data = Appointment::where('title','LIKE', '%'.$keyword.'%')->where('status',$status)->where('is_walkin',0)->orderBy('id','DESC')->pluck('id');
+                $data = Appointment::whereIn('client_id',$ids)->where('status',$status)->where('is_walkin',0)->orderBy('id','DESC')->pluck('id');
             }
         }
 
@@ -90,7 +93,7 @@ class AppointmentController extends Controller
                 $email = $user->email;
                 $text = "You have a new Appointment Request from";
                 $status = Auth::user()->profile->firstname.' '.Auth::user()->profile->lastname;
-                Notification::route('mail', $email)->notify(new newApp($status,$text));
+                // Notification::route('mail', $email)->notify(new newApp($status,$text));
             }
         }
 
@@ -300,7 +303,7 @@ class AppointmentController extends Controller
     public function lawyersearch(Request $request){
 
         $keyword = $request->input('word');
-        $status = ($request->input('status') == 'All') ? '' : $request->input('status');
+        $status = ($request->input('status') == 'All') ? 'All' : $request->input('status');
         $to = ($request->input('to') == '') ? '' : Carbon::parse($request->input('to'))->startOfDay(); 
         $from =($request->input('from') == '') ? '' : Carbon::parse($request->input('from'))->startOfDay();
         
@@ -308,19 +311,24 @@ class AppointmentController extends Controller
 
         // $data = LawyerAppointment::where('lawyer_id',$user_id)->orderBy('id','DESC')->paginate(5);
         // $data = Appointment::where('client_id',$user_id)->where('title', 'LIKE', '%'.$keyword.'%')->where('status',$status)->paginate(5);
-        $ids = Profile::where('firstname','LIKE', '%'.$keyword.'%')->orWhere('lastname','LIKE', '%'.$keyword.'%')->pluck('id');
+        $ids = Profile::where(\DB::raw('concat(firstname," ",lastname)'),'LIKE', '%'.$keyword.'%')->pluck('user_id');
 
-        $data =  LawyerAppointment::where('lawyer_id',$user_id)->where('status','!=','Declined')->orderBy('id','DESC')
+        $data =  LawyerAppointment::where('lawyer_id',$user_id)->orderBy('id','DESC')
         ->whereHas('appointment',function($query) use ($ids) {
             return $query->whereIn('client_id',$ids);
         })
         ->pluck('appointment_id');
 
         if($from != '' && $to != ''){
-            $apps = Appointment::whereIn('id',$data)
-            ->whereBetween('created_at',[$from,$to])->paginate(8);
+
+            $query = Appointment::query();
+            ($status == 'All') ? '' : $query->where('status', $status);
+            $apps = $query->whereBetween('created_at',[$from,$to])->paginate(8);
+
         }else{
-            $apps = Appointment::whereIn('id',$data)->paginate(8);
+            $query = Appointment::query();
+            ($status == 'All') ? '' : $query->where('status', $status);
+            $apps = $query->whereIn('id',$data)->paginate(8);
         }
         return AResource::collection($apps);
     }

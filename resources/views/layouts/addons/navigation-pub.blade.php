@@ -36,7 +36,19 @@
                         <li class="pcoded">
                             <a href="/reports" class="waves-effect waves-dark">
                                 <span class="pcoded-micon"><i class="iconfont icofont-listine-dots"></i></span>
-                                <span class="pcoded-mtext">Reports</span>
+                                <span class="pcoded-mtext">Appointment Reports</span>
+                            </a>
+                        </li>
+                        <li class="pcoded">
+                            <a href="/reports" class="waves-effect waves-dark">
+                                <span class="pcoded-micon"><i class="iconfont icofont-listine-dots"></i></span>
+                                <span class="pcoded-mtext">Lawyer/Legal Practice Reports</span>
+                            </a>
+                        </li>
+                        <li class="pcoded">
+                            <a href="/insights" class="waves-effect waves-dark">
+                                <span class="pcoded-micon"><i class="iconfont icofont-listine-dots"></i></span>
+                                <span class="pcoded-mtext">Insights</span>
                             </a>
                         </li>
                     @elseif(Auth::user()->type == 'Client')

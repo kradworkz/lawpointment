@@ -21,6 +21,7 @@ class ReportResource extends JsonResource
             'legalpractice' => $this->legalpractice->name,
             'status' => $this->status,
             'client' => $this->user->profile->firstname.' '.$this->user->profile->lastname,
+            'email' => $this->user->email,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'scheduled_at' =>($this->schedule() != NULL) ? $this->schedule()->date : 'n/a',

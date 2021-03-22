@@ -38,6 +38,7 @@ Vue.component('register', require('./components/Register.vue').default);
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('dropdown', require('./components/Dropdown.vue').default);
 Vue.component('report', require('./components/Report.vue').default);
+Vue.component('insight', require('./components/Insight.vue').default);
 Vue.component('lawyer', require('./components/Lawyer.vue').default);
 Vue.component('client', require('./components/Client.vue').default);
 Vue.component('appointment', require('./components/Appointment.vue').default);

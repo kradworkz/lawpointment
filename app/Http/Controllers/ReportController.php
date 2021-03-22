@@ -53,20 +53,32 @@ class ReportController extends Controller
             $month = ($request->input('month') == '') ? date('m') : $request->input('month');
             $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
             $type = $request->input('selected');
+            $from = $request->input('from');
+            $to = $request->input('to');
+            $status = $request->input('status');
 
     
             if($type == 'Daily')
             {   
-                $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
+                $query = Appointment::query();
+                ($status == 'All') ? '' : $query->where('status', $status);
+                $ids = $query->whereHas('lawyers',function($query) {
                     return $query->where('lawyer_id', Auth::user()->id);
                 })->pluck('id');
                 
-                $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereDate('updated_at','=',$date)->count();
-                $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereDate('updated_at','=',$date)->whereHas('lawyers',function($query) {
-                    return $query->where('lawyer_id', Auth::user()->id);
-                })->count();
-                $prods3 =  Appointment::whereIn('id',$ids)->whereDate('updated_at','=',$date)->groupBy('client_id')->count();
-                
+                if($from == '' || $to == ''){
+                    $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereDate('updated_at','=',$date)->count();
+                    $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereDate('updated_at','=',$date)->whereHas('lawyers',function($query) {
+                        return $query->where('lawyer_id', Auth::user()->id);
+                    })->count();
+                    $prods3 =  Appointment::whereIn('id',$ids)->whereDate('updated_at','=',$date)->groupBy('client_id')->count();
+                }else{
+                    $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('updated_at',[$from,$to])->count();
+                    $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereBetween('updated_at',[$from,$to])->whereHas('lawyers',function($query) {
+                        return $query->where('lawyer_id', Auth::user()->id);
+                    })->count();
+                    $prods3 =  Appointment::whereIn('id',$ids)->whereBetween('updated_at',[$from,$to])->groupBy('client_id')->count();
+                }   
                 $prods4 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('is_walkin',1)
                 ->whereDate('updated_at','=',$date)
@@ -96,7 +108,7 @@ class ReportController extends Controller
     
              
     
-                $date = Carbon::createFromFormat('Y-m-d', $date)->format('M d, Y');
+                $date = ($from != '' || $to != '') ? $from .'-'. $to : Carbon::createFromFormat('Y-m-d', $date)->format('M d, Y');
     
             }else if($type == 'Weekly'){
                 
@@ -264,15 +276,29 @@ class ReportController extends Controller
         public function reports(Request $request){
 
             $type = $request->input('selected');
+            $lawyer = $request->input('lawyer');
             $month = ($request->input('month') == '') ? date('m') : $request->input('month');
             $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
+            $status = $request->input('status');
+            $from = $request->input('from');
+            $to = $request->input('to');
 
-    
+            if($lawyer != ''){
+                $ids = Appointment::whereHas('lawyers',function($query) use ($lawyer) {
+                    return $query->where('lawyer_id', $lawyer);
+                })->pluck('id');
+            } 
+
             $query = Appointment::query();
-            $query = $query->where('status','Finished');
+            ($status == 'All') ? '' : $query->where('status', $status);
+            ($lawyer == '') ? '' : $query->whereIn('id', $ids);
             
             if($type == 'Daily'){
-                $query = $query->whereDate('created_at',date('Y-m-d'));
+                if($from == '' || $to == ''){
+                    $query = $query->whereDate('created_at',date('Y-m-d'));
+                }else{
+                    $query->whereBetween('created_at',[$from,$to]);
+                }
             }else if($type == 'Weekly'){
                 $query =  $query->whereBetween('created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
             }else if($type == 'Monthly'){
@@ -280,8 +306,10 @@ class ReportController extends Controller
             }else{
                 $query = $query->whereYear('created_at',$year);
             }
-    
+            
+            $query = $query->orderBy('client_id');
             $data = $query->get();
+            
     
             return ReportResource::collection($data);
         }

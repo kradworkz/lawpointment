@@ -20,17 +20,25 @@ class InsightController extends Controller
         $type = $request->input('selected');
         $month = ($request->input('month') == '') ? date('m') : $request->input('month');
         $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
+        $from = $request->input('from');
+        $to = $request->input('to');
+        $status = $request->input('status');
 
         if($type == 'Daily')
-        {
-            $prods1 =  Appointment::where('is_walkin',1)->where('status','Finished')->whereDate('updated_at','=',$date)->count();
-            $prods2 =  Appointment::where('is_walkin',0)->where('status','Finished')->whereDate('updated_at','=',$date)->count();
-            $prods3 =  User::where('type','Client')->whereDate('updated_at','=',$date)->count();
-            
+        {   
+            if($from == '' && $to == ''){
+                $prods1 =  Appointment::where('is_walkin',1)->where('status','Finished')->whereDate('created_at','=',$date)->count();
+                $prods2 =  Appointment::where('is_walkin',0)->where('status','Finished')->whereDate('created_at','=',$date)->count();
+                $prods3 =  User::where('type','Client')->whereDate('created_at','=',$date)->count();
+            }else{
+                $prods1 =  Appointment::where('is_walkin',1)->where('status','Finished')->whereBetween('created_at',[$from,$to])->count();
+                $prods2 =  Appointment::where('is_walkin',0)->where('status','Finished')->whereBetween('created_at',[$from,$to])->count();
+                $prods3 =  User::where('type','Client')->whereBetween('created_at',[$from,$to])->count();
+            }
             $prods4 =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->where('is_walkin',1)
-            ->whereDate('updated_at','=',$date)
+            ->whereDate('created_at','=',$date)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(1)
@@ -40,7 +48,7 @@ class InsightController extends Controller
             $prods5 =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->where('is_walkin',0)
-            ->whereDate('updated_at','=',$date)
+            ->whereDate('created_at','=',$date)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(1)
@@ -60,8 +68,8 @@ class InsightController extends Controller
 
          
 
-            $date = Carbon::createFromFormat('Y-m-d', $date)->format('M d, Y');
-
+            $date = ($from != '' || $to != '') ? Carbon::createFromFormat('Y-m-d', $from)->format('M d, Y') .' to '. Carbon::createFromFormat('Y-m-d', $to)->format('M d, Y') : Carbon::createFromFormat('Y-m-d', $date)->format('M d, Y');
+    
         }else if($type == 'Weekly'){
 
             $prods1 = Appointment::where('is_walkin',1)->where('status','Finished')->whereBetween('created_at', [
@@ -203,7 +211,7 @@ class InsightController extends Controller
             $date = 'Year of '.Carbon::now()->format('Y');
         }
 
-        $titles = ['Online Appointments', 'Walk-in Appointments', 'Registered Clients','Online Legal Practice', 'Walk-in Legal Practice','Most Appointed Lawyer'];
+        $titles = ['Finished Online Appointments', 'Finished Walk-in Appointments', 'Registered Clients',' Most Selected Online Legal Practice', 'Most Selected Walk-in Legal Practice','Most Appointed Lawyer'];
         $definition = ['Number of Online Appointments','Number of walkin Appointments','Number Clients',  'Most in Online', 'Most in Walk-in','Most Appointed Lawyer',];
         
         array_push($array, $prods1, $prods2, $prods3,$prods4,$prods5,$prods6);

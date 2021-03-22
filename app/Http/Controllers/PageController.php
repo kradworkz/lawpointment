@@ -46,6 +46,11 @@ class PageController extends Controller
         return view('user_secretary.report');
     }
 
+    public function insights()
+    {
+        return view('user_secretary.insight');
+    }
+
     public function lawyers()
     {
         return view('user_secretary.lawyer');

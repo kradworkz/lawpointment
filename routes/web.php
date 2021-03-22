@@ -48,6 +48,7 @@ Route::middleware(['role:Lawyer','auth'])->group(function () {
 Route::middleware(['role:Administrator','auth'])->group(function () {
 
     Route::get('/reports', 'PageController@reports'); 
+    Route::get('/insights', 'PageController@insights'); 
     Route::get('/dropdowns', 'PageController@dropdowns');  
     Route::get('/lawyers/list', 'PageController@lawyers');  
     Route::get('/appointments/list', 'PageController@appointments'); 
