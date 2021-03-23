@@ -53,7 +53,7 @@ class InsightController extends Controller
             
             $prods6 =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
             ->whereHas('appointment',function($query) use ($date){
-                $query->where('status','Finished')->whereDate('updated_at','=',$date);
+                $query->where('status','Finished')->whereDate('created_at','=',$date);
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
@@ -233,7 +233,7 @@ class InsightController extends Controller
             ($from != '') ? $date = $from : '';
             $data =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
-            ->whereDate('updated_at','=',$date)
+            ->whereDate('created_at','=',$date)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(5)
@@ -281,7 +281,7 @@ class InsightController extends Controller
         }else{
             $data =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
-            ->whereBetween('created_at',[$from,$to])
+            ->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
             ->limit(5)
@@ -308,7 +308,7 @@ class InsightController extends Controller
             ($from != '') ? $date = $from : '';
             $data =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
             ->whereHas('appointment',function($query) use ($date){
-                $query->where('status','Finished')->whereDate('updated_at','=',$date);
+                $query->where('status','Finished')->whereDate('created_at','=',$date);
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
@@ -363,7 +363,7 @@ class InsightController extends Controller
         }else{
             $data =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))
             ->whereHas('appointment',function($query) use ($from,$to){
-                $query->where('status','Finished')->whereBetween('created_at',[$from,$to]);
+                $query->where('status','Finished')->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')

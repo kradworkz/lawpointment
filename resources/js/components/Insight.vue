@@ -69,7 +69,7 @@
                             </div>
                             <div ref="html2Pdf" style="padding: 40px;">
                                 <div class="row">
-                                    <h5>Insights (<span v-if="selected == 'Daily' || selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                    <h5>Insights (<span v-if="selected == 'Daily'">{{(from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                 <br>
                                 </div>
                                 <div class="row">
@@ -81,33 +81,6 @@
                                         <p style="font-size: 12px; opacity: .7">{{ ins.def[index] }}</p>
                                     </div>
                                 </div>
-                                <!-- <div class="row">
-                                    <div class="col-md-6"><br>
-                                        <ul class="scroll-list cards" >
-                                            <li>
-                                                <span style="float: right; opacity: 0.5;">#</span> 
-                                                <h6 class="icon-btn"> &nbsp;TOP 5 MOST PICKED LAWYER</h6>
-                                            </li>
-                                            <li v-for="lawyer in lawyers" v-bind:key="lawyer.id">
-                                                <span style="float: right; opacity: 0.5;">{{ lawyer.count}}</span> 
-                                                <h6 class="icon-btn"><i class="fa fa-map-marker text-primary"></i> &nbsp;{{lawyer.lawyer}}</h6>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <div class="col-md-6"><br>
-                                        <ul class="scroll-list cards">
-                                            <li>
-                                                <span style="float: right; opacity: 0.5;">#</span> 
-                                                <h6 class="icon-btn"> &nbsp;TOP 5 MOST PICKED LEGAL PRACTICE</h6>
-                                            </li>
-                                            <li v-for="legal in legals" v-bind:key="legal.id">
-                                                <span style="float: right; opacity: 0.5;">{{ legal.count}}</span> 
-                                                <h6 class="icon-btn"><i class="fa fa-map-marker text-primary"></i> &nbsp;{{legal.legalpractice}}</h6>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
 
@@ -141,7 +114,8 @@ export default {
             show : false,
             month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
             yearr: new Date().getFullYear(),
-            months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            today:new Date().toISOString().slice(0, 10)
         }
     },
 

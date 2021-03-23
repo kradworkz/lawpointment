@@ -67,7 +67,7 @@ class AppointmentController extends Controller
         }
 
         if($from != '' && $to != ''){
-            $apps = Appointment::whereIn('id',$data)->whereBetween('created_at',[$from,$to])->paginate(5);
+            $apps = Appointment::whereIn('id',$data)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->paginate(5);
         }else{
             $apps = Appointment::whereIn('id',$data)->paginate(5);
         }
@@ -304,8 +304,8 @@ class AppointmentController extends Controller
 
         $keyword = $request->input('word');
         $status = ($request->input('status') == 'All') ? 'All' : $request->input('status');
-        $to = ($request->input('to') == '') ? '' : Carbon::parse($request->input('to'))->startOfDay(); 
-        $from =($request->input('from') == '') ? '' : Carbon::parse($request->input('from'))->startOfDay();
+        $to = ($request->input('to') == '') ? '' : $request->input('to'); 
+        $from =($request->input('from') == '') ? '' : $request->input('from');
         
         $user_id = Auth::user()->id;
 
@@ -323,7 +323,7 @@ class AppointmentController extends Controller
 
             $query = Appointment::query();
             ($status == 'All') ? '' : $query->where('status', $status);
-            $apps = $query->whereBetween('created_at',[$from,$to])->paginate(8);
+            $apps = $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->paginate(8);
 
         }else{
             $query = Appointment::query();

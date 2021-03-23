@@ -11,6 +11,7 @@ import VueToast from 'vue-toast-notification';
 Vue.use(VueToast);
 import ToggleButton from 'vue-js-toggle-button';
 Vue.use(ToggleButton);
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

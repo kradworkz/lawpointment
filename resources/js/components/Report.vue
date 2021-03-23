@@ -88,8 +88,8 @@
                                 </div>
                             </div>
                            
-                            <div ref="html2Pdf" style="padding: 40px;">
-                                <h5>List of Appointments (<span v-if="selected == 'Daily'">{{ from }}</span> <span v-if="selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5><br>
+                            <div class="col-md-12" ref="html2Pdf" style="padding: 40px;">
+                                <h5>List of Appointments  (<span v-if="selected == 'Daily'">{{ (from == '') ? today : from }}</span> <span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5><br>
                                 <table class="table table-striped" style="min-width: 100%; ">
                                     <thead>
                                         <tr>
@@ -126,6 +126,7 @@
 
 <script>
 import html2PDF from 'jspdf-html2canvas';
+import moment from 'moment';
 export default {
     data() {
         return {
@@ -142,6 +143,7 @@ export default {
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             from: '',
             to: '',
+             today:new Date().toISOString().slice(0, 10)
         }
     },
 

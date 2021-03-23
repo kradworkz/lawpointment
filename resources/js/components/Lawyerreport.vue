@@ -70,7 +70,7 @@
                             <div ref="html2Pdf" style="padding: 40px;">
                                 
                                 <div class="row">
-                                    <h5>Top 5 Lawyers (<span v-if="selected == 'Daily'">{{ (from != '') ? from : selected }}</span> <span v-if="selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                    <h5>Top 5 Lawyers (<span v-if="selected == 'Daily'">{{ (from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span><span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                     <table class="table table-striped" style="min-width: 100%;">
                                         <thead>
                                             <tr>
@@ -94,7 +94,7 @@
                                 </div>
     <br><br>
                                 <div class="row">
-                                    <h5>Top 5 Legal Practice (<span v-if="selected == 'Daily'">{{ (from != '') ? from : selected }}</span> <span v-if="selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                    <h5>Top 5 Legal Practice (<span v-if="selected == 'Daily'">{{(from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                     <table class="table table-striped" style="min-width: 100%;">
                                         <thead>
                                             <tr>
@@ -144,7 +144,8 @@ export default {
             month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
             yearr: new Date().getFullYear(),
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-            toplawyer: ''
+            toplawyer: '',
+             today:new Date().toISOString().slice(0, 10)
         }
     },
 

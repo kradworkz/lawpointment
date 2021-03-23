@@ -95,7 +95,7 @@
                                     </div><br>
                                 <div class="col-md-12" ref="html2Pdf">
                                     <div class="row">
-                                        <h5>List of Appointments (<span v-if="selected == 'Daily'">{{ (from != '') ? from : selected }}</span> <span v-if="selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                        <h5>List of Appointments (<span v-if="selected == 'Daily'">{{ (from != '') ? from : today }}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span>  <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                         <table class="table table-striped" style="min-width: 100%;">
                                             <thead>
                                                 <tr>
@@ -148,7 +148,8 @@ export default {
             yearr: new Date().getFullYear(),
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             from: '',
-            to: ''
+            to: '',
+              today:new Date().toISOString().slice(0, 10)
         }
     },
 

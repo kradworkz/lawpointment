@@ -43,7 +43,7 @@ class ReportController extends Controller
         }else if($type == 'Anually'){
             $query = $query->whereYear('created_at',$year);
         }else{
-            $query = $query->whereBetween('created_at',[$from,$to]);
+            $query = $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
         }
 
         $data = $query->get();
@@ -81,11 +81,11 @@ class ReportController extends Controller
                     })->count();
                     $prods3 =  Appointment::whereIn('id',$ids)->whereDate('created_at','=',$date)->groupBy('client_id')->count();
                 }else{
-                    $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('created_at',[$from,$to])->count();
-                    $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereBetween('created_at',[$from,$to])->whereHas('lawyers',function($query) {
+                    $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->count();
+                    $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->whereHas('lawyers',function($query) {
                         return $query->where('lawyer_id', Auth::user()->id);
                     })->count();
-                    $prods3 =  Appointment::whereIn('id',$ids)->whereBetween('created_at',[$from,$to])->groupBy('client_id')->count();
+                    $prods3 =  Appointment::whereIn('id',$ids)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->groupBy('client_id')->count();
                 }   
                 $prods4 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('is_walkin',1)
@@ -271,13 +271,13 @@ class ReportController extends Controller
                     return $query->where('lawyer_id', Auth::user()->id);
                 })->pluck('id');
     
-                $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('created_at',[$from,$to])->count();
-                $prods2 = Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereBetween('created_at',[$from,$to])->count();
-                $prods3 =  Appointment::whereIn('id',$ids)->whereBetween('created_at',[$from,$to])->groupBy('client_id')->count();
+                $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->count();
+                $prods2 = Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->count();
+                $prods3 =  Appointment::whereIn('id',$ids)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->groupBy('client_id')->count();
     
                 $prods4 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('is_walkin',1)
-                ->whereBetween('created_at',[$from,$to])
+                ->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])
                 ->groupBy('legalpractice_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -286,7 +286,7 @@ class ReportController extends Controller
     
                 $prods5 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('is_walkin',0)
-                ->whereBetween('created_at',[$from,$to])
+                ->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])
                 ->groupBy('legalpractice_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -295,7 +295,7 @@ class ReportController extends Controller
     
     
                 $prods6 =  Appointment::whereIn('id',$ids)->select('client_id',\DB::raw("count(*) as count"))
-                ->whereBetween('created_at',[$from,$to])
+                ->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])
                 ->groupBy('client_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -350,7 +350,7 @@ class ReportController extends Controller
             }else if($type == 'Anually'){
                 $query->whereYear('created_at',$year);
             }else{
-                $query->whereBetween('created_at',[$from,$to]);
+                $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
             }
             
             $query = $query->orderBy('client_id');
