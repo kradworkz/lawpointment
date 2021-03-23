@@ -5,7 +5,7 @@
                 <ul>
                     <li><a href="#">Home</a></li>
                     <li><a href="#">Lawyer</a></li>
-                    <li>Appointment Reports</li>
+                    <li>Insights</li>
                 </ul>
             </div>
         </div>
@@ -18,7 +18,7 @@
                         <nav id="secondary_nav">
                             <div class="container">
                                 <ul class="clearfix">
-                                    <li><a href="#section_1" class="active">Appointments Report (day/month/year)</a></li>
+                                    <li><a href="#section_1" class="active">Insights (day/month/year)</a></li>
                                     <li><a href="#sidebar"></a></li>
                                 </ul>
                             </div>
@@ -27,16 +27,7 @@
                             <div class="box_general">
                                    
                                     <div class="row">
-                                         <div class="col-md-2">
-                                            <div class="custom-form">
-                                                <select class="form-control" @click="type" v-model="status" placeholder="Summary">
-                                                    <option value="All">All</option>
-                                                    <option value="Pending">Pending</option>
-                                                    <option value="Accepted">Accepted</option>
-                                                    <option value="Finished">Finished</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                        
                                         <div class="col-md-2">
                                             <div class="custom-form">
                                                 <select class="form-control" @click="type" v-model="selected" placeholder="Summary">
@@ -89,36 +80,25 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <button  class="btn btn-primary" @click="generateReport" style="float: right;">Print</button>
                                         </div>
                                     </div><br>
                                 <div class="col-md-12" ref="html2Pdf">
-                                    <div class="row">
-                                        <h5>List of Appointments (<span v-if="selected == 'Daily'">{{ (from != '') ? from : selected }}</span> <span v-if="selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
-                                        <table class="table table-striped" style="min-width: 100%;">
-                                            <thead>
-                                                <tr>
-                                                    <th class="text-center" v-if="user == 'Lawyer'">Client</th>
-                                                    <th class="text-center" v-else>Lawyer</th>
-                                                    <th class="text-center">Legal Practice</th>
-                                                    <th class="text-center">Status</th>
-                                                    <th class="text-center">Scheduled Date</th>
-                                                    <th class="text-center">Booked Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="appointment in appointments" v-bind:key="appointment.id">
-                                                    <td class="text-center" v-if="user == 'Lawyer'">{{appointment.client}}</td>
-                                                    <td class="text-center" v-else>{{appointment.lawyer_name}}</td>
-                                                    <td class="text-center">{{appointment.legalpractice}}</td>
-                                                    <td class="text-center">{{appointment.status}}</td>
-                                                    <td class="text-center">{{appointment.scheduled_at}}</td>
-                                                    <td class="text-center">{{appointment.created_at}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table><br>
+                                    <div class="row" v-if="user == 'Lawyer'">
+                                        <h5>Insights (<span v-if="selected == 'Daily'">{{ (from != '') ? from : selected }}</span> <span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                     </div>
+                                    
+                                     <div class="row" v-if="user == 'Lawyer'">
+                                        <div class="col-md-4 ins" v-for="(insight,index) in ins.title" v-bind:key="insight.id">
+                                            <b style="font-weight: bold; font-size: 14px;">{{insight}}</b>
+                                            <p style="font-size: 12px; opacity: .7"> {{ ins.date }} </p>
+                                            <h2 style="font-weight: bold; font-size: 30px;" v-if="index == 3 || index == 4 || index == 5"> {{ ins.count[index] }} </h2>
+                                            <h2 v-else> {{ ins.count[index] }} </h2>
+                                            <p style="font-size: 12px; opacity: .7">{{ ins.def[index] }}</p>
+                                        </div>
+                                    </div>
+                                    <br><br>
                                 </div>
                             </div>
                         </div>
@@ -140,10 +120,12 @@ export default {
             errors: [],
             pagination: {},
             keyword: '',
-            appointments : [],
+            dates: [],
+            lawyers : [],
+            legals : [],
+            ins: [],
             selected : 'Daily',
             status: 'All',
-            show : false,
             month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
             yearr: new Date().getFullYear(),
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
@@ -153,27 +135,28 @@ export default {
     },
 
     created(){
-        this.fetch();
+        this.fetchInsights();
     },
 
     watch: {
         from: function () {
-            (this.to != '' && this.from != '') ? this.fetch(): '';
-            (this.selected == 'Daily' && this.from != '') ? this.fetch() : ''; 
+            (this.to != '' && this.from != '') ? this.fetchInsights(): '';
+            (this.selected == 'Daily' && this.from != '') ? this.fetchInsights() : ''; 
         },
 
         to: function () {
-            (this.to != '' && this.from != '') ? this.fetch(): '';
+            (this.to != '' && this.from != '') ? this.fetchInsights(): '';
         }
     },
 
     methods : {
         type(){
-           this.fetch();
+           this.fetchInsights();
         },
+       
 
-        fetch(){
-            axios.post(this.currentUrl + '/request/myreports',{
+        fetchInsights(page_url) {
+            axios.post(this.currentUrl + '/request/myreports/insights',{
                 selected : this.selected,
                 month: this.month,
                 year: this.yearr,
@@ -182,10 +165,10 @@ export default {
                 to: this.to
             })
             .then(response => {
-                this.appointments = response.data.data;
+                this.ins = response.data[0];
             })
             .catch(err => console.log(err));
-        },
+        },    
 
         generateReport () {
             html2PDF(this.$refs.html2Pdf, {
@@ -203,3 +186,39 @@ export default {
     }, components : { html2PDF}
 }
 </script>
+
+<style>
+    .has-error small{
+        color: red;
+        font-size: 12px;
+    }
+    .has-error input{
+        border-color: red;
+    }
+    .test {
+        margin-left: 10px; 
+        background-color:red;
+    }
+    .ins {
+        background-color: #F8FBFE;
+        border: 1px solid #eee;
+        min-height: 180px;
+        text-align:left;     
+        padding: 20px;   
+    }
+    .ins h2{
+        font-size:  30px;
+        margin-top: -10px;
+    }
+    .ins2 {
+        background-color: #F8FBFE;
+        border: 1px solid #eee;
+        min-height: 200px;
+        text-align:left;     
+        padding: 10px;   
+    }
+    .ins2 h2{
+        font-size:  30px;
+        margin-top: -10px;
+    }
+</style>

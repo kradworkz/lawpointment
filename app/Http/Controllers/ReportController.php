@@ -17,26 +17,33 @@ class ReportController extends Controller
         $type = $request->input('selected');
         $month = ($request->input('month') == '') ? date('m') : $request->input('month');
         $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
+        $from = $request->input('from');
+        $to = $request->input('to');
+        $status = $request->input('status');
 
         if(Auth::user()->type == 'Lawyer'){
-            $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
+            $ids = Appointment::whereHas('lawyers',function($query) {
                 return $query->where('lawyer_id', Auth::user()->id);
             })->pluck('id');
         }else{
-            $ids = Appointment::where('status','Finished')->where('client_id',Auth::user()->id)->pluck('id');
+            $ids = Appointment::where('client_id',Auth::user()->id)->pluck('id');
         }
 
         $query = Appointment::query();
-        $query = $query->whereIn('id',$ids)->where('status','Finished');
+        $query = $query->whereIn('id',$ids);
+        ($status == 'All') ? '' : $query = $query->where('status',$status);
         
         if($type == 'Daily'){
-            $query = $query->whereDate('created_at',date('Y-m-d'));
+            $query =($from != '') ?  $query->whereDate('created_at',$from) : $query->whereDate('created_at',date('Y-m-d'));
+
         }else if($type == 'Weekly'){
             $query =  $query->whereBetween('created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
         }else if($type == 'Monthly'){
             $query = $query->whereMonth('created_at',$month);
-        }else{
+        }else if($type == 'Anually'){
             $query = $query->whereYear('created_at',$year);
+        }else{
+            $query = $query->whereBetween('created_at',[$from,$to]);
         }
 
         $data = $query->get();
@@ -60,6 +67,7 @@ class ReportController extends Controller
     
             if($type == 'Daily')
             {   
+                ($from != '') ? $date = $from : '';
                 $query = Appointment::query();
                 ($status == 'All') ? '' : $query->where('status', $status);
                 $ids = $query->whereHas('lawyers',function($query) {
@@ -67,21 +75,21 @@ class ReportController extends Controller
                 })->pluck('id');
                 
                 if($from == '' || $to == ''){
-                    $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereDate('updated_at','=',$date)->count();
-                    $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereDate('updated_at','=',$date)->whereHas('lawyers',function($query) {
+                    $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereDate('created_at','=',$date)->count();
+                    $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereDate('created_at','=',$date)->whereHas('lawyers',function($query) {
                         return $query->where('lawyer_id', Auth::user()->id);
                     })->count();
-                    $prods3 =  Appointment::whereIn('id',$ids)->whereDate('updated_at','=',$date)->groupBy('client_id')->count();
+                    $prods3 =  Appointment::whereIn('id',$ids)->whereDate('created_at','=',$date)->groupBy('client_id')->count();
                 }else{
-                    $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('updated_at',[$from,$to])->count();
-                    $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereBetween('updated_at',[$from,$to])->whereHas('lawyers',function($query) {
+                    $prods1 =  Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('created_at',[$from,$to])->count();
+                    $prods2 =  Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereBetween('created_at',[$from,$to])->whereHas('lawyers',function($query) {
                         return $query->where('lawyer_id', Auth::user()->id);
                     })->count();
-                    $prods3 =  Appointment::whereIn('id',$ids)->whereBetween('updated_at',[$from,$to])->groupBy('client_id')->count();
+                    $prods3 =  Appointment::whereIn('id',$ids)->whereBetween('created_at',[$from,$to])->groupBy('client_id')->count();
                 }   
                 $prods4 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('is_walkin',1)
-                ->whereDate('updated_at','=',$date)
+                ->whereDate('created_at','=',$date)
                 ->groupBy('legalpractice_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -90,7 +98,7 @@ class ReportController extends Controller
     
                 $prods5 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
                 ->where('is_walkin',0)
-                ->whereDate('updated_at','=',$date)
+                ->whereDate('created_at','=',$date)
                 ->groupBy('legalpractice_id')
                 ->orderBy('count','DESC')
                 ->limit(1)
@@ -106,9 +114,7 @@ class ReportController extends Controller
     
                 $prods6 = (!empty($prods6[0])) ? $prods6[0]->user->profile->firstname.' '.$prods6[0]->user->profile->lastname : 'None';
     
-             
-    
-                $date = ($from != '' || $to != '') ? $from .'-'. $to : Carbon::createFromFormat('Y-m-d', $date)->format('M d, Y');
+                $date = ($from != '') ? Carbon::createFromFormat('Y-m-d', $from)->format('M d, Y') : Carbon::createFromFormat('Y-m-d', $date)->format('M d, Y');
     
             }else if($type == 'Weekly'){
                 
@@ -216,7 +222,8 @@ class ReportController extends Controller
                 $prods6 = (!empty($prods6[0])) ? $prods6[0]->user->profile->firstname.' '.$prods6[0]->user->profile->lastname : 'None';
                
                 $date = 'Month of '.Carbon::now()->format('F');
-            }else{
+
+            }else if($type == 'Anually'){
 
                   
                 $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
@@ -258,9 +265,48 @@ class ReportController extends Controller
                 $prods6 = (!empty($prods6[0])) ? $prods6[0]->user->profile->firstname.' '.$prods6[0]->user->profile->lastname : 'None';
     
                 $date = 'Year of '.Carbon::now()->format('Y');
+            }else{
+
+                $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
+                    return $query->where('lawyer_id', Auth::user()->id);
+                })->pluck('id');
+    
+                $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('created_at',[$from,$to])->count();
+                $prods2 = Appointment::whereIn('id',$ids)->where('is_walkin',0)->whereBetween('created_at',[$from,$to])->count();
+                $prods3 =  Appointment::whereIn('id',$ids)->whereBetween('created_at',[$from,$to])->groupBy('client_id')->count();
+    
+                $prods4 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
+                ->where('is_walkin',1)
+                ->whereBetween('created_at',[$from,$to])
+                ->groupBy('legalpractice_id')
+                ->orderBy('count','DESC')
+                ->limit(1)
+                ->get();
+                $prods4 = (!empty($prods4[0])) ? $prods4[0]->legalpractice->name: 'None';
+    
+                $prods5 =  Appointment::whereIn('id',$ids)->select('legalpractice_id',\DB::raw("count(*) as count"))
+                ->where('is_walkin',0)
+                ->whereBetween('created_at',[$from,$to])
+                ->groupBy('legalpractice_id')
+                ->orderBy('count','DESC')
+                ->limit(1)
+                ->get();
+                $prods5 = (!empty($prods5[0])) ? $prods5[0]->legalpractice->name: 'None';
+    
+    
+                $prods6 =  Appointment::whereIn('id',$ids)->select('client_id',\DB::raw("count(*) as count"))
+                ->whereBetween('created_at',[$from,$to])
+                ->groupBy('client_id')
+                ->orderBy('count','DESC')
+                ->limit(1)
+                ->get();
+    
+                $prods6 = (!empty($prods6[0])) ? $prods6[0]->user->profile->firstname.' '.$prods6[0]->user->profile->lastname : 'None';
+    
+                $date = Carbon::createFromFormat('Y-m-d', $from)->format('M d, Y') .' to '. Carbon::createFromFormat('Y-m-d', $to)->format('M d, Y');
             }
     
-            $titles = ['Online Appointments', 'Walk-in Appointments', 'No. of Clients','Online Legal Practice', 'Walk-in Legal Practice','Most Appointed Client'];
+            $titles = ['Finished Online Appointments', 'Finished Walk-in Appointments', 'No. of Clients','Most Selected Online Legal Practice', 'Most Selected Walk-in Legal Practice','Most Appointed Lawyer'];
             $definition = ['Number of Online Appointments','Number of walkin Appointments','Number Clients',  'Most in Online', 'Most in Walk-in','Most Appointed Client',];
             
             array_push($array, $prods1, $prods2, $prods3,$prods4,$prods5,$prods6);
@@ -294,17 +340,17 @@ class ReportController extends Controller
             ($lawyer == '') ? '' : $query->whereIn('id', $ids);
             
             if($type == 'Daily'){
-                if($from == '' || $to == ''){
-                    $query = $query->whereDate('created_at',date('Y-m-d'));
-                }else{
-                    $query->whereBetween('created_at',[$from,$to]);
-                }
+                ($from != '') ? $d = $from : $d = date('Y-m-d');
+                $query = $query->whereDate('created_at',$d);
+                
             }else if($type == 'Weekly'){
                 $query =  $query->whereBetween('created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
             }else if($type == 'Monthly'){
                 $query = $query->whereMonth('created_at',$month);
+            }else if($type == 'Anually'){
+                $query->whereYear('created_at',$year);
             }else{
-                $query = $query->whereYear('created_at',$year);
+                $query->whereBetween('created_at',[$from,$to]);
             }
             
             $query = $query->orderBy('client_id');

@@ -16,7 +16,8 @@ class InsightResource extends JsonResource
     {
         return [
             'count' => $this->count,
-            'legalpractice' => $this->legalpractice->name
+            'legalpractice' => $this->legalpractice->name,
+            'legalpractice_id' => $this->legalpractice->id,
         ];
     }
 }

@@ -33,6 +33,7 @@
 								<li><a href="/lawyers">Lawyers</a></li>|
 								<li><a href="/myappointments">Appointments</a></li>|
 								@elseif(Auth::user()->type == 'Lawyer')
+								<li><a href="/myinsights">Insights</a></li>|
 								<li><a href="/calendar">Calendar</a></li> |
 								@endif
 								<li><a href="/settings">Settings</a></li> |

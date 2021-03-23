@@ -16,6 +16,7 @@ class TopResource extends JsonResource
     {
         return [
             'count' => $this->count,
+            'accepted' => $this->lawyer->accepted(),
             'lawyer' => $this->lawyer->profile->firstname.' '.$this->lawyer->profile->lastname
         ];
     }

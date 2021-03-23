@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
    
     Route::get('/settings', 'PageController@settings');  
     Route::get('/myreports', 'PageController@myreports');  
+    Route::get('/myinsights', 'PageController@myinsights');  
 
 });
 
@@ -48,6 +49,7 @@ Route::middleware(['role:Lawyer','auth'])->group(function () {
 Route::middleware(['role:Administrator','auth'])->group(function () {
 
     Route::get('/reports', 'PageController@reports'); 
+    Route::get('/lawyerreports', 'PageController@lawyerreports'); 
     Route::get('/insights', 'PageController@insights'); 
     Route::get('/dropdowns', 'PageController@dropdowns');  
     Route::get('/lawyers/list', 'PageController@lawyers');  
@@ -145,4 +147,5 @@ Route::prefix('request')->group(function () {
     Route::post('/myreports', 'ReportController@index');
     Route::post('/myreports/insights', 'ReportController@insights');
     Route::post('/myreportss', 'ReportController@reports');
+    Route::post('/toplawyer', 'InsightController@toplawyer');
 });

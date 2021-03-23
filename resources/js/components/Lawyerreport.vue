@@ -49,13 +49,13 @@
                                                 <option value="2030">2030</option>
                                             </select>
                                             <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="custom-form no-icons" v-if="selected == 'Daily' || selected == 'Date Range'">
+                                                <div class="col-md-6" v-if="selected == 'Daily' || selected == 'Date Range'">
+                                                    <div class="custom-form no-icons">
                                                         <input type="date" v-model="from" placeholder="Date Example : 09/12/2019">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="custom-form no-icons" v-if="selected == 'Date Range'">
+                                                <div class="col-md-6" v-if="selected == 'Date Range'">
+                                                    <div class="custom-form no-icons">
                                                         <input type="date" v-model="to" placeholder="Date Example : 09/12/2019">
                                                     </div>
                                                 </div>
@@ -68,46 +68,52 @@
                                 </div>
                             </div>
                             <div ref="html2Pdf" style="padding: 40px;">
+                                
                                 <div class="row">
-                                    <h5>Insights (<span v-if="selected == 'Daily' || selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
-                                <br>
+                                    <h5>Top 5 Lawyers (<span v-if="selected == 'Daily'">{{ (from != '') ? from : selected }}</span> <span v-if="selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                    <table class="table table-striped" style="min-width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>Rank </th>
+                                                <th class="text-center">Lawyer</th>
+                                                <th class="text-center">Finished Appointments</th>
+                                                <th class="text-center">Accepted Appointments</th>
+                                                <th class="text-center">Total no. of Appointments</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(lawyer,index) in lawyers" v-bind:key="lawyer.id">
+                                                <td >{{index + 1}}</td>
+                                                <td class="text-center">{{lawyer.lawyer}}</td>
+                                                <td class="text-center">{{lawyer.count}}</td>
+                                                <td class="text-center">{{lawyer.accepted}}</td>
+                                                <td class="text-center">{{lawyer.count + lawyer.accepted}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table><br>
                                 </div>
+    <br><br>
                                 <div class="row">
-                                    <div class="col-md-4 ins" v-for="(insight,index) in ins.title" v-bind:key="insight.id">
-                                        <b style="font-weight: bold; font-size: 14px;">{{insight}}</b>
-                                        <p style="font-size: 12px; opacity: .7"> {{ ins.date }} </p>
-                                        <h2 style="font-weight: bold; font-size: 30px;" v-if="index == 3 || index == 4 || index == 5"> {{ ins.count[index] }} </h2>
-                                        <h2 v-else> {{ ins.count[index] }} </h2>
-                                        <p style="font-size: 12px; opacity: .7">{{ ins.def[index] }}</p>
-                                    </div>
+                                    <h5>Top 5 Legal Practice (<span v-if="selected == 'Daily'">{{ (from != '') ? from : selected }}</span> <span v-if="selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                    <table class="table table-striped" style="min-width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>Rank </th>
+                                                <th class="text-center">Legal Practice</th>
+                                                <th class="text-center">No. of Appointments</th>
+                                                <th class="text-center">Lawyer Most Appointed on Legal Practice</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(legal,index) in legals" v-bind:key="legal.id">
+                                                <td >{{index + 1}}</td>
+                                                <td class="text-center">{{legal.legalpractice}}</td>
+                                                <td class="text-center">{{legal.count}}</td>
+                                                <td class="text-center">{{check(legal.legalpractice_id)}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table><br>
                                 </div>
-                                <!-- <div class="row">
-                                    <div class="col-md-6"><br>
-                                        <ul class="scroll-list cards" >
-                                            <li>
-                                                <span style="float: right; opacity: 0.5;">#</span> 
-                                                <h6 class="icon-btn"> &nbsp;TOP 5 MOST PICKED LAWYER</h6>
-                                            </li>
-                                            <li v-for="lawyer in lawyers" v-bind:key="lawyer.id">
-                                                <span style="float: right; opacity: 0.5;">{{ lawyer.count}}</span> 
-                                                <h6 class="icon-btn"><i class="fa fa-map-marker text-primary"></i> &nbsp;{{lawyer.lawyer}}</h6>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <div class="col-md-6"><br>
-                                        <ul class="scroll-list cards">
-                                            <li>
-                                                <span style="float: right; opacity: 0.5;">#</span> 
-                                                <h6 class="icon-btn"> &nbsp;TOP 5 MOST PICKED LEGAL PRACTICE</h6>
-                                            </li>
-                                            <li v-for="legal in legals" v-bind:key="legal.id">
-                                                <span style="float: right; opacity: 0.5;">{{ legal.count}}</span> 
-                                                <h6 class="icon-btn"><i class="fa fa-map-marker text-primary"></i> &nbsp;{{legal.legalpractice}}</h6>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
 
@@ -129,59 +135,83 @@ export default {
             currentUrl: window.location.origin,
             errors: [],
             pagination: {},
-            dates: [],
-            ins: [],
-            appointments: [],
-            lawyers : [],
+            lawyers: [],
             legals : [],
             status: 'All',
             from: '',
             to:'',
             selected : 'Daily',
-            show : false,
             month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
             yearr: new Date().getFullYear(),
-            months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            toplawyer: ''
         }
     },
 
      created(){
-        this.fetchInsights();
-        // this.fetchReport1();
-        // this.fetchReport2();
+        this.fetch();
+        this.fetch2();
     },
 
      watch: {
         from: function () {
-            (this.to != '' && this.from != '') ? this.fetchInsights(): '';
-            (this.selected == 'Daily' && this.from != '') ? this.fetchInsights() : ''; 
+            (this.to != '' && this.from != '') ? this.type(): '';
+            (this.selected == 'Daily' && this.from != '') ? this.type() : ''; 
         },
 
         to: function () {
-            (this.to != '' && this.from != '') ? this.fetchInsights(): '';
+            (this.to != '' && this.from != '') ? this.type(): '';
         }
     },
 
+  
     methods : {
-        type(){
-            this.fetchInsights();
+
+        check : function(id){
+            axios.post(this.currentUrl+'/request/toplawyer',{
+                id: id
+            })
+            .then(response => {
+                this.toplawyer = response.data;
+            })
+            .catch(err => console.log(err));
+            
+            return this.toplawyer;
         },
 
-        fetchInsights() {
-            axios.post(this.currentUrl+'/request/insights',{
+        type(){
+            this.fetch();
+            this.fetch2();
+        },
+
+        fetch() {
+             axios.post(this.currentUrl+'/request/reports',{
                 selected : this.selected,
                 month: this.month,
                 year: this.yearr,
-                status: this.status,
                 from: this.from,
                 to: this.to
             })
             .then(response => {
-                this.ins = response.data[0];
+                this.legals = response.data.data;
             })
             .catch(err => console.log(err));
-        },    
-
+        },   
+         
+        fetch2() {
+             axios.post(this.currentUrl+'/request/reports2',{
+                selected : this.selected,
+                month: this.month,
+                year: this.yearr,
+                from: this.from,
+                to: this.to
+            })
+            .then(response => {
+                this.lawyers = response.data.data;
+            })
+            .catch(err => console.log(err));
+        },     
+    
 
          generateReport () {
             html2PDF(this.$refs.html2Pdf, {

@@ -34,9 +34,10 @@
                                     <div class="custom-form">
                                         <select  @click="type" v-model="selected" placeholder="Summary">
                                             <option value="Daily">Daily</option>
-                                            <option value="Weekly">Weekly</option>
+                                            <!-- <option value="Weekly">Weekly</option> -->
                                             <option value="Monthly">Monthly</option>
                                             <option value="Anually">Anually</option>
+                                            <option value="Date Range">Date Range</option>
                                         </select>
                                     </div>
                                 </div>
@@ -70,14 +71,14 @@
                                                 <option value="2029">2029</option>
                                                 <option value="2030">2030</option>
                                             </select>
-                                            <div class="row" v-if="selected == 'Daily'">
+                                            <div class="row">
                                                 <div class="col-md-6">
-                                                    <div class="custom-form no-icons">
+                                                    <div class="custom-form no-icons" v-if="selected == 'Daily' || selected == 'Date Range'">
                                                         <input type="date" v-model="from" placeholder="Date Example : 09/12/2019">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="custom-form no-icons">
+                                                    <div class="custom-form no-icons" v-if="selected == 'Date Range'">
                                                         <input type="date" v-model="to" placeholder="Date Example : 09/12/2019">
                                                     </div>
                                                 </div>
@@ -88,7 +89,7 @@
                             </div>
                            
                             <div ref="html2Pdf" style="padding: 40px;">
-                                <h5>List of Appointments (<span v-if="selected == 'Daily' || selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5><br>
+                                <h5>List of Appointments (<span v-if="selected == 'Daily'">{{ from }}</span> <span v-if="selected == 'Weekly'">{{selected}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5><br>
                                 <table class="table table-striped" style="min-width: 100%; ">
                                     <thead>
                                         <tr>
@@ -135,7 +136,7 @@ export default {
             appointments: [],
             status: 'All',
             lawyer: '',
-            selected : 'Weekly',
+            selected : 'Daily',
             month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
             yearr: new Date().getFullYear(),
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
@@ -152,6 +153,7 @@ export default {
     watch: {
         from: function () {
             (this.to != '' && this.from != '') ? this.fetch(): '';
+            (this.selected == 'Daily' && this.from != '') ? this.fetch() : ''; 
         },
 
         to: function () {
@@ -162,13 +164,7 @@ export default {
 
     methods : {
         type(){
-            if(this.selected == 'Daily'){
-                if(this.from != '' && this.to != ''){
-                    this.fetch();
-                }
-            }else{
-                this.fetch();
-            }
+            this.fetch();
         },
 
         fetchLawyers(){

@@ -45,6 +45,10 @@ class PageController extends Controller
     {
         return view('user_secretary.report');
     }
+    public function lawyerreports()
+    {
+        return view('user_secretary.lawyerreport');
+    }
 
     public function insights()
     {
@@ -75,6 +79,11 @@ class PageController extends Controller
     public function myreports()
     {
         return view('myreports');
+    }
+
+    public function myinsights()
+    {
+        return view('myinsights');
     }
    
 }

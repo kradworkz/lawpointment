@@ -26,15 +26,11 @@ class InsightController extends Controller
 
         if($type == 'Daily')
         {   
-            if($from == '' && $to == ''){
-                $prods1 =  Appointment::where('is_walkin',1)->where('status','Finished')->whereDate('created_at','=',$date)->count();
-                $prods2 =  Appointment::where('is_walkin',0)->where('status','Finished')->whereDate('created_at','=',$date)->count();
-                $prods3 =  User::where('type','Client')->whereDate('created_at','=',$date)->count();
-            }else{
-                $prods1 =  Appointment::where('is_walkin',1)->where('status','Finished')->whereBetween('created_at',[$from,$to])->count();
-                $prods2 =  Appointment::where('is_walkin',0)->where('status','Finished')->whereBetween('created_at',[$from,$to])->count();
-                $prods3 =  User::where('type','Client')->whereBetween('created_at',[$from,$to])->count();
-            }
+            ($from != '') ? $date = $from : '';
+            $prods1 =  Appointment::where('is_walkin',1)->where('status','Finished')->whereDate('created_at','=',$date)->count();
+            $prods2 =  Appointment::where('is_walkin',0)->where('status','Finished')->whereDate('created_at','=',$date)->count();
+            $prods3 =  User::where('type','Client')->whereDate('created_at','=',$date)->count();
+           
             $prods4 =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->where('is_walkin',1)
@@ -68,29 +64,29 @@ class InsightController extends Controller
 
          
 
-            $date = ($from != '' || $to != '') ? Carbon::createFromFormat('Y-m-d', $from)->format('M d, Y') .' to '. Carbon::createFromFormat('Y-m-d', $to)->format('M d, Y') : Carbon::createFromFormat('Y-m-d', $date)->format('M d, Y');
+            $date =  Carbon::createFromFormat('Y-m-d', $date)->format('M d, Y');
     
-        }else if($type == 'Weekly'){
+        }else if($type == 'Date Range'){
 
             $prods1 = Appointment::where('is_walkin',1)->where('status','Finished')->whereBetween('created_at', [
-                Carbon::parse('last monday')->startOfDay(),
-                Carbon::parse('next friday')->endOfDay(),
+                $from,
+                $to,
             ])->count();
             $prods2 =  Appointment::where('is_walkin',0)->where('status','Finished')->whereBetween('created_at', [
-                Carbon::parse('last monday')->startOfDay(),
-                Carbon::parse('next friday')->endOfDay(),
+                $from,
+                $to,
             ])->count();
             $prods3 =  User::where('type','Client')->whereBetween('created_at', [
-                Carbon::parse('last monday')->startOfDay(),
-                Carbon::parse('next friday')->endOfDay(),
+                $from,
+                $to,
             ])->count();
 
             $prods4 =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->where('is_walkin',1)
             ->whereBetween('created_at', [
-                Carbon::parse('last monday')->startOfDay(),
-                Carbon::parse('next friday')->endOfDay(),
+                $from,
+                $to,
             ])
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
@@ -102,8 +98,8 @@ class InsightController extends Controller
             ->where('status','Finished') 
             ->where('is_walkin',0)
             ->whereBetween('created_at', [
-                Carbon::parse('last monday')->startOfDay(),
-                Carbon::parse('next friday')->endOfDay(),
+                $from,
+                $to,
             ])
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
@@ -112,10 +108,10 @@ class InsightController extends Controller
             $prods5 = (!empty($prods5[0])) ? $prods5[0]->legalpractice->name: 'None';
 
             $prods6 =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
-            ->whereHas('appointment',function($query) use ($date){
+            ->whereHas('appointment',function($query) use ($from,$to){
                 $query->where('status','Finished')->whereBetween('created_at', [
-                    Carbon::parse('last monday')->startOfDay(),
-                    Carbon::parse('next friday')->endOfDay(),
+                    $from,
+                    $to,
                 ]);
             }) 
             ->groupBy('lawyer_id')
@@ -126,9 +122,7 @@ class InsightController extends Controller
             $prods6= (!empty($prods6[0])) ? $prods6[0]->lawyer->profile->firstname.' '.$prods6[0]->lawyer->profile->lastname : 'None';
     
 
-            $d1 = Carbon::parse('last monday')->startOfDay()->format('M d, Y');
-            $d2 = Carbon::parse('next friday')->endOfDay()->format('M d, Y');
-            $date = $d1.' - '.$d2;
+            $date = Carbon::createFromFormat('Y-m-d', $from)->format('M d, Y') .' to '. Carbon::createFromFormat('Y-m-d', $to)->format('M d, Y');
 
         }else if($type == 'Monthly'){
 
@@ -231,10 +225,12 @@ class InsightController extends Controller
         $type = $request->input('selected');
         $month = ($request->input('month') == '') ? date('m') : $request->input('month');
         $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
+        $from = $request->input('from');
+        $to = $request->input('to');
 
         if($type == 'Daily')
         {
-          
+            ($from != '') ? $date = $from : '';
             $data =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
             ->where('status','Finished') 
             ->whereDate('updated_at','=',$date)
@@ -270,7 +266,7 @@ class InsightController extends Controller
             ->get();
             return InsightResource::collection($data);
 
-        }else{
+        }else if($type == 'Anually'){
 
         
             $data =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
@@ -282,6 +278,15 @@ class InsightController extends Controller
             ->get();
             return InsightResource::collection($data);
 
+        }else{
+            $data =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
+            ->where('status','Finished') 
+            ->whereBetween('created_at',[$from,$to])
+            ->groupBy('legalpractice_id')
+            ->orderBy('count','DESC')
+            ->limit(5)
+            ->get();
+            return InsightResource::collection($data);
         }
 
         return true;
@@ -295,10 +300,12 @@ class InsightController extends Controller
         $type = $request->input('selected');
         $month = ($request->input('month') == '') ? date('m') : $request->input('month');
         $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
+        $from = $request->input('from');
+        $to = $request->input('to');
 
         if($type == 'Daily')
         {
-          
+            ($from != '') ? $date = $from : '';
             $data =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
             ->whereHas('appointment',function($query) use ($date){
                 $query->where('status','Finished')->whereDate('updated_at','=',$date);
@@ -340,7 +347,7 @@ class InsightController extends Controller
 
             return TopResource::collection($data);
 
-        }else{
+        }else if($type == 'Anually'){
 
             $data =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
             ->whereHas('appointment',function($query) use ($year){
@@ -353,9 +360,38 @@ class InsightController extends Controller
 
             return TopResource::collection($data);
 
+        }else{
+            $data =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))
+            ->whereHas('appointment',function($query) use ($from,$to){
+                $query->where('status','Finished')->whereBetween('created_at',[$from,$to]);
+            }) 
+            ->groupBy('lawyer_id')
+            ->orderBy('count','DESC')
+            ->limit(5)
+            ->get();
+
+            return TopResource::collection($data);
         }
 
         return true;
 
     }
+
+    public function toplawyer(Request $request){
+        $id = $request->input('id');
+        $from = $request->input('from');
+        $to = $request->input('to');
+
+        $prods6 =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
+        ->whereHas('appointment',function($query) use ($id){
+            $query->where('status','Finished')->where('legalpractice_id',$id);
+        }) 
+        ->groupBy('lawyer_id')
+        ->orderBy('count','DESC')
+        ->limit(1)
+        ->get();
+
+        return $prods6 = (!empty($prods6[0])) ? $prods6[0]->lawyer->profile->firstname.' '.$prods6[0]->lawyer->profile->lastname : 'None';
+
+    }   
 }
