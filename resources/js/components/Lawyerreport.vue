@@ -9,7 +9,7 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="custom-form">
-                                        <select  @click="type" v-model="selected" placeholder="Summary">
+                                        <select  v-model="selected" placeholder="Summary">
                                             <option value="Daily">Daily</option>
                                             <!-- <option value="Weekly">Weekly</option> -->
                                             <option value="Monthly">Monthly</option>
@@ -21,7 +21,7 @@
                                 <div class="col-md-3">
                                     <div class="custom-form">
                                         <div class="custom-form">
-                                            <select v-if="selected == 'Monthly'" @click="type" v-model="month" placeholder="Summary">
+                                            <select v-if="selected == 'Monthly'" v-model="month" placeholder="Summary">
                                                 <option value="01">January</option>
                                                 <option value="02">February</option>
                                                 <option value="03">March</option>
@@ -36,7 +36,7 @@
                                                 <option value="12">December</option>
                                             </select>
 
-                                            <select v-if="selected == 'Anually'" @click="type" v-model="yearr" placeholder="Summary">
+                                            <select v-if="selected == 'Anually'" v-model="yearr" placeholder="Summary">
                                                 <option value="2021">2021</option>
                                                 <option value="2022">2022</option>
                                                 <option value="2023">2023</option>
@@ -105,11 +105,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(legal,index) in legals" v-bind:key="legal.id">
+                                            <tr v-for="(legal,index) in legals" v-bind:key="legal.id" >
                                                 <td >{{index + 1}}</td>
                                                 <td class="text-center">{{legal.legalpractice}}</td>
                                                 <td class="text-center">{{legal.count}}</td>
-                                                <td class="text-center">{{check(legal.legalpractice_id)}}</td>
+                                                <td class="text-center">{{ toplawyer[index] }} - {{toplawyer}}</td>
                                             </tr>
                                         </tbody>
                                     </table><br>
@@ -144,7 +144,7 @@ export default {
             month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
             yearr: new Date().getFullYear(),
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-            toplawyer: '',
+            toplawyer: [],
              today:new Date().toISOString().slice(0, 10)
         }
     },
@@ -162,23 +162,25 @@ export default {
 
         to: function () {
             (this.to != '' && this.from != '') ? this.type(): '';
-        }
+        },
+
+        month: function(){
+            this.type();
+        },
+
+        yearr: function(){
+            this.type();
+        },
+
+        selected: function(){
+            this.type();
+        },
+
+       
     },
 
   
     methods : {
-
-        check : function(id){
-            axios.post(this.currentUrl+'/request/toplawyer',{
-                id: id
-            })
-            .then(response => {
-                this.toplawyer = response.data;
-            })
-            .catch(err => console.log(err));
-            
-            return this.toplawyer;
-        },
 
         type(){
             this.fetch();
@@ -186,6 +188,9 @@ export default {
         },
 
         fetch() {
+            
+                this.toplawyer = [];
+                this.legals = [];
              axios.post(this.currentUrl+'/request/reports',{
                 selected : this.selected,
                 month: this.month,
@@ -195,6 +200,22 @@ export default {
             })
             .then(response => {
                 this.legals = response.data.data;
+                
+                for(var i=0; i < this.legals.length; i++){
+                    if(this.legals.length > 0){
+                        axios.post(this.currentUrl+'/request/toplawyer',{
+                            id: this.legals[i].legalpractice_id,
+                            month: this.month,
+                            year: this.yearr,
+                            from: this.from,
+                            to: this.to,
+                            selected: this.selected
+                        })
+                        .then(res => {
+                            this.toplawyer.push(res.data);
+                        })
+                    }
+                } 
             })
             .catch(err => console.log(err));
         },   

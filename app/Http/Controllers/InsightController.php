@@ -378,14 +378,32 @@ class InsightController extends Controller
     }
 
     public function toplawyer(Request $request){
+
         $id = $request->input('id');
         $from = $request->input('from');
         $to = $request->input('to');
+        $date = Carbon::now()->format( 'Y-m-d' );
+        $type = $request->input('selected');
+        $month = ($request->input('month') == '') ? date('m') : $request->input('month');
+        $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
 
-        $prods6 =  LawyerAppointment::select('lawyer_id',\DB::raw("count(*) as count"))->where('status','Finished') 
-        ->whereHas('appointment',function($query) use ($id){
-            $query->where('status','Finished')->where('legalpractice_id',$id);
-        }) 
+
+        $query = Appointment::query();
+        $query->where('status', 'Finished')->where('legalpractice_id',$id);
+        if($type == 'Daily'){
+            ($from != '') ? $d = $from : $d = date('Y-m-d');
+            $query = $query->whereDate('created_at',$d);
+        }else if($type == 'Monthly'){
+            $query = $query->whereMonth('created_at',$month);
+        }else if($type == 'Anually'){
+            $query->whereYear('created_at',$year);
+        }else{
+            $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
+        }
+        $ids = $query->pluck('id');
+        
+
+        $prods6 =  LawyerAppointment::whereIn('appointment_id',$ids)->select('lawyer_id',\DB::raw("count(*) as count"))
         ->groupBy('lawyer_id')
         ->orderBy('count','DESC')
         ->limit(1)
