@@ -205,8 +205,8 @@ class InsightController extends Controller
             $date = 'Year of '.Carbon::now()->format('Y');
         }
 
-        $titles = ['Finished Online Appointments', 'Finished Walk-in Appointments', 'Registered Clients',' Most Selected Online Legal Practice', 'Most Selected Walk-in Legal Practice','Most Appointed Lawyer'];
-        $definition = ['Number of Online Appointments','Number of walkin Appointments','Number Clients',  'Most in Online', 'Most in Walk-in','Most Appointed Lawyer',];
+        $titles = ['Finished Online Appointments', 'Finished Walk-in Appointments', 'Registered Clients',' Frequently Requested Online Legal Practice', 'Frequently Requested Walk-in Legal Practice','Lawyer with most Appointments'];
+        $definition = ['Number of Online Appointments','Number of walkin Appointments','Number Clients',  'Most in Online', 'Most in Walk-in','Lawyer with most Appointments',];
         
         array_push($array, $prods1, $prods2, $prods3,$prods4,$prods5,$prods6);
           $dataSet[] = [
@@ -239,7 +239,31 @@ class InsightController extends Controller
             ->limit(5)
             ->get();
            
-            return InsightResource::collection($data);
+            $prods = InsightResource::collection($data);
+
+            foreach($prods as $prod){
+                $id =  $prod->legalpractice->id;
+
+                $query = Appointment::query();
+                $query->where('status', 'Finished')->where('legalpractice_id',$id);
+                ($from != '') ? $d = $from : $d = date('Y-m-d');
+                $query = $query->whereDate('created_at',$d);
+                $ids = $query->pluck('id');
+                
+        
+                $prods6 =  LawyerAppointment::whereIn('appointment_id',$ids)->select('lawyer_id',\DB::raw("count(*) as count"))
+                ->groupBy('lawyer_id')
+                ->orderBy('count','DESC')
+                ->limit(1)
+                ->get();
+
+                $dataSet[] = [
+                    'count'  => $prod->count,
+                    'legalpractice'  => $prod->legalpractice->name,
+                    'lawyer'    => $prods6[0]->lawyer->profile->firstname.' '.$prods6[0]->lawyer->profile->lastname
+                ];
+            }
+            return $dataSet;
 
         }else if($type == 'Weekly'){
 
@@ -264,7 +288,31 @@ class InsightController extends Controller
             ->orderBy('count','DESC')
             ->limit(5)
             ->get();
-            return InsightResource::collection($data);
+            $prods = InsightResource::collection($data);
+            
+            foreach($prods as $prod){
+                $id =  $prod->legalpractice->id;
+
+                $query = Appointment::query();
+                $query->where('status', 'Finished')->where('legalpractice_id',$id);
+                $query = $query->whereMonth('created_at',$month);
+                $ids = $query->pluck('id');
+                
+        
+                $prods6 =  LawyerAppointment::whereIn('appointment_id',$ids)->select('lawyer_id',\DB::raw("count(*) as count"))
+                ->groupBy('lawyer_id')
+                ->orderBy('count','DESC')
+                ->limit(1)
+                ->get();
+
+                $dataSet[] = [
+                    'count'  => $prod->count,
+                    'legalpractice'  => $prod->legalpractice->name,
+                    'lawyer'    => $prods6[0]->lawyer->profile->firstname.' '.$prods6[0]->lawyer->profile->lastname
+                ];
+            }
+
+            return $dataSet;
 
         }else if($type == 'Anually'){
 
@@ -276,7 +324,31 @@ class InsightController extends Controller
             ->orderBy('count','DESC')
             ->limit(5)
             ->get();
-            return InsightResource::collection($data);
+            $prods = InsightResource::collection($data);
+            
+            foreach($prods as $prod){
+                $id =  $prod->legalpractice->id;
+
+                $query = Appointment::query();
+                $query->where('status', 'Finished')->where('legalpractice_id',$id);
+                $query = $query->whereYear('created_at',$year);
+                $ids = $query->pluck('id');
+                
+        
+                $prods6 =  LawyerAppointment::whereIn('appointment_id',$ids)->select('lawyer_id',\DB::raw("count(*) as count"))
+                ->groupBy('lawyer_id')
+                ->orderBy('count','DESC')
+                ->limit(1)
+                ->get();
+
+                $dataSet[] = [
+                    'count'  => $prod->count,
+                    'legalpractice'  => $prod->legalpractice->name,
+                    'lawyer'    => $prods6[0]->lawyer->profile->firstname.' '.$prods6[0]->lawyer->profile->lastname
+                ];
+            }
+
+            return $dataSet;
 
         }else{
             $data =  Appointment::select('legalpractice_id',\DB::raw("count(*) as count"))
@@ -286,7 +358,32 @@ class InsightController extends Controller
             ->orderBy('count','DESC')
             ->limit(5)
             ->get();
-            return InsightResource::collection($data);
+
+            $prods = InsightResource::collection($data);
+            
+            foreach($prods as $prod){
+                $id =  $prod->legalpractice->id;
+
+                $query = Appointment::query();
+                $query->where('status', 'Finished')->where('legalpractice_id',$id);
+                $query = $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
+                $ids = $query->pluck('id');
+                
+        
+                $prods6 =  LawyerAppointment::whereIn('appointment_id',$ids)->select('lawyer_id',\DB::raw("count(*) as count"))
+                ->groupBy('lawyer_id')
+                ->orderBy('count','DESC')
+                ->limit(1)
+                ->get();
+
+                $dataSet[] = [
+                    'count'  => $prod->count,
+                    'legalpractice'  => $prod->legalpractice->name,
+                    'lawyer'    => $prods6[0]->lawyer->profile->firstname.' '.$prods6[0]->lawyer->profile->lastname
+                ];
+            }
+
+            return $dataSet;
         }
 
         return true;

@@ -109,7 +109,7 @@
                                                 <td >{{index + 1}}</td>
                                                 <td class="text-center">{{legal.legalpractice}}</td>
                                                 <td class="text-center">{{legal.count}}</td>
-                                                <td class="text-center">{{ toplawyer[index] }}</td>
+                                                <td class="text-center">{{ legal.lawyer }}</td>
                                             </tr>
                                         </tbody>
                                     </table><br>
@@ -199,23 +199,7 @@ export default {
                 to: this.to
             })
             .then(response => {
-                this.legals = response.data.data;
-                
-                for(var i=0; i < this.legals.length; i++){
-                    if(this.legals.length > 0){
-                        axios.post(this.currentUrl+'/request/toplawyer',{
-                            id: this.legals[i].legalpractice_id,
-                            month: this.month,
-                            year: this.yearr,
-                            from: this.from,
-                            to: this.to,
-                            selected: this.selected
-                        })
-                        .then(res => {
-                            this.toplawyer.push(res.data);
-                        })
-                    }
-                } 
+                this.legals = response.data;
             })
             .catch(err => console.log(err));
         },   

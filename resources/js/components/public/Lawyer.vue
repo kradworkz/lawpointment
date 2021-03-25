@@ -314,7 +314,9 @@ export default {
 
             let itemid = lawyer.specialization.id;
             let aa = this.legalpractices.map(item => item.id).indexOf(itemid) // find index of your object
-            this.legalpractice = this.legalpractices[aa];
+            if(this.legalpractice == ''){
+                this.legalpractice = this.legalpractices[aa];
+            }
             this.selectedlawyer = lawyer.id;
             this.selected = true;
             this.lawyers = this.lawyers.filter(x => x.id == lawyer.id);
