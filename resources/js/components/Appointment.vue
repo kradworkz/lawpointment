@@ -90,7 +90,7 @@
                                                 <tr>
                                                     <th>Client</th>
                                                     <th>Lawyer</th>
-                                                    <th>Title</th>
+                                                    <th>Legal Practice</th>
                                                     <th>Booking Date</th>
                                                     <th>Scheduled at</th>
                                                     <th>Status</th>
@@ -104,7 +104,7 @@
                                                     <td><a
                                                             class="email-name waves-effect">{{appointment.lawyer_name}}</a>
                                                     </td>
-                                                    <td><a class="email-name waves-effect">{{appointment.title}}</a>
+                                                    <td><a class="email-name waves-effect">{{appointment.legalpractice}}</a>
                                                     </td>
                                                     <td style="font-size: 12px;">{{appointment.created_at}}</td>
                                                     <td style="font-size: 12px;">{{appointment.scheduled_at}}</td>
