@@ -109,7 +109,7 @@
                                                 <td >{{index + 1}}</td>
                                                 <td class="text-center">{{legal.legalpractice}}</td>
                                                 <td class="text-center">{{legal.count}}</td>
-                                                <td class="text-center">{{ toplawyer[index] }} - {{toplawyer}}</td>
+                                                <td class="text-center">{{ toplawyer[index] }}</td>
                                             </tr>
                                         </tbody>
                                     </table><br>

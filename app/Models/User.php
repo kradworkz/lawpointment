@@ -76,6 +76,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\LawyerAppointment', 'lawyer_id')->whereIn('status',['Pending','Accepted'])->count();
     }
 
+    function acceptedreport()
+    {
+        return $this->hasMany('App\Models\LawyerAppointment', 'lawyer_id')->whereIn('status',['Accepted'])->count();
+    }
+
     function clientappointment()
     {
         return $this->hasMany('App\Models\Appointment', 'client_id');
@@ -93,7 +98,7 @@ class User extends Authenticatable
 
     function finished()
     {
-        return $this->hasMany('App\Models\Appointment', 'client_id')->where('status','Successful')->count();
+        return $this->hasMany('App\Models\Appointment', 'client_id')->where('status','Finished')->count();
     }
 
 

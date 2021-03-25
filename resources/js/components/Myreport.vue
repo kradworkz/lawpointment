@@ -101,6 +101,7 @@
                                                 <tr>
                                                     <th class="text-center" v-if="user == 'Lawyer'">Client</th>
                                                     <th class="text-center" v-else>Lawyer</th>
+                                                    <th class="text-center" v-if="user == 'Lawyer'">Email</th>
                                                     <th class="text-center">Legal Practice</th>
                                                     <th class="text-center">Status</th>
                                                     <th class="text-center">Scheduled Date</th>
@@ -111,6 +112,7 @@
                                                 <tr v-for="appointment in appointments" v-bind:key="appointment.id">
                                                     <td class="text-center" v-if="user == 'Lawyer'">{{appointment.client}}</td>
                                                     <td class="text-center" v-else>{{appointment.lawyer_name}}</td>
+                                                    <td class="text-center" v-if="user == 'Lawyer'">{{appointment.email}}</td>
                                                     <td class="text-center">{{appointment.legalpractice}}</td>
                                                     <td class="text-center">{{appointment.status}}</td>
                                                     <td class="text-center">{{appointment.scheduled_at}}</td>
