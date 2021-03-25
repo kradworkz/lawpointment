@@ -144,7 +144,6 @@ export default {
             month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
             yearr: new Date().getFullYear(),
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-            toplawyer: [],
              today:new Date().toISOString().slice(0, 10)
         }
     },
@@ -187,10 +186,7 @@ export default {
             this.fetch2();
         },
 
-        fetch() {
-            
-                this.toplawyer = [];
-                this.legals = [];
+        fetch() { 
              axios.post(this.currentUrl+'/request/reports',{
                 selected : this.selected,
                 month: this.month,
