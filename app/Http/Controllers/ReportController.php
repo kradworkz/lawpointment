@@ -68,10 +68,14 @@ class ReportController extends Controller
             if($type == 'Daily')
             {   
                 ($from != '') ? $date = $from : '';
-                $query = Appointment::query();
-                ($status == 'All') ? '' : $query->where('status', $status);
-                $ids = $query->whereHas('lawyers',function($query) {
-                    return $query->where('lawyer_id', Auth::user()->id);
+                // $query = Appointment::query();
+                // ($status == 'All') ? '' : $query->where('status', $status);
+                // $ids = $query->whereHas('lawyers',function($query) {
+                //     return $query->where('lawyer_id', Auth::user()->id);
+                // })->pluck('id');
+
+                $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
+                    return $query->where('lawyer_id', Auth::user()->id)->where('status','Finished');
                 })->pluck('id');
                 
                 if($from == '' || $to == ''){
@@ -119,7 +123,7 @@ class ReportController extends Controller
             }else if($type == 'Weekly'){
                 
                 $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
-                    return $query->where('lawyer_id', Auth::user()->id);
+                    return $query->where('lawyer_id', Auth::user()->id)->where('status','Finished');
                 })->pluck('id');
                 
                 $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->where('status','Finished')->whereBetween('created_at', [
@@ -183,7 +187,7 @@ class ReportController extends Controller
             }else if($type == 'Monthly'){
                 
                 $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
-                    return $query->where('lawyer_id', Auth::user()->id);
+                    return $query->where('lawyer_id', Auth::user()->id)->where('status','Finished');
                 })->pluck('id');
                 
 
@@ -227,7 +231,7 @@ class ReportController extends Controller
 
                   
                 $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
-                    return $query->where('lawyer_id', Auth::user()->id);
+                    return $query->where('lawyer_id', Auth::user()->id)->where('status','Finished');
                 })->pluck('id');
     
                 $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->where('status','Finished')->whereYear('created_at',$year)->count();
@@ -268,7 +272,7 @@ class ReportController extends Controller
             }else{
 
                 $ids = Appointment::where('status','Finished')->whereHas('lawyers',function($query) {
-                    return $query->where('lawyer_id', Auth::user()->id);
+                    return $query->where('lawyer_id', Auth::user()->id)->where('status','Finished');
                 })->pluck('id');
     
                 $prods1 = Appointment::whereIn('id',$ids)->where('is_walkin',1)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->count();

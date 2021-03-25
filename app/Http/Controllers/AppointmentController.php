@@ -93,7 +93,7 @@ class AppointmentController extends Controller
                 $email = $user->email;
                 $text = "You have a new Appointment Request from";
                 $status = Auth::user()->profile->firstname.' '.Auth::user()->profile->lastname;
-                // Notification::route('mail', $email)->notify(new newApp($status,$text));
+                Notification::route('mail', $email)->notify(new newApp($status,$text));
             }
         }
 
