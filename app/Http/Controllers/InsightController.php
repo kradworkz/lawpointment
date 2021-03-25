@@ -235,7 +235,7 @@ class InsightController extends Controller
             ->where('status','Finished') 
             ->whereDate('created_at','=',$date)
             ->groupBy('legalpractice_id')
-            ->orderBy('count','DESC')
+            ->orderBy('count','ASC')
             ->limit(5)
             ->get();
            
@@ -253,7 +253,7 @@ class InsightController extends Controller
             
                     $prods6 =  LawyerAppointment::whereIn('appointment_id',$ids)->select('lawyer_id',\DB::raw("count(*) as count"))
                     ->groupBy('lawyer_id')
-                    ->orderBy('count','DESC')
+                    ->orderBy('count','ASC')
                     ->limit(1)
                     ->get();
 
