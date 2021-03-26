@@ -227,6 +227,7 @@ class InsightController extends Controller
         $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
         $from = $request->input('from');
         $to = $request->input('to');
+        $no = $request->input('no');
 
         if($type == 'Daily')
         {
@@ -236,7 +237,7 @@ class InsightController extends Controller
             ->whereDate('created_at','=',$date)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
            
             $prods = InsightResource::collection($data);
@@ -276,7 +277,7 @@ class InsightController extends Controller
             ])
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
             return InsightResource::collection($data);
 
@@ -287,7 +288,7 @@ class InsightController extends Controller
             ->whereMonth('created_at',$month)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
             $prods = InsightResource::collection($data);
             
@@ -325,7 +326,7 @@ class InsightController extends Controller
             ->whereYear('created_at',$year)
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
             $prods = InsightResource::collection($data);
             if($prods->count() != 0){
@@ -360,7 +361,7 @@ class InsightController extends Controller
             ->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])
             ->groupBy('legalpractice_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
 
             $prods = InsightResource::collection($data);
@@ -405,6 +406,7 @@ class InsightController extends Controller
         $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
         $from = $request->input('from');
         $to = $request->input('to');
+        $no = $request->input('no');
 
         if($type == 'Daily')
         {
@@ -415,7 +417,7 @@ class InsightController extends Controller
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
 
             return TopResource::collection($data);
@@ -431,7 +433,7 @@ class InsightController extends Controller
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
 
             return TopResource::collection($data);
@@ -445,7 +447,7 @@ class InsightController extends Controller
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
 
             return TopResource::collection($data);
@@ -458,7 +460,7 @@ class InsightController extends Controller
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
 
             return TopResource::collection($data);
@@ -470,7 +472,7 @@ class InsightController extends Controller
             }) 
             ->groupBy('lawyer_id')
             ->orderBy('count','DESC')
-            ->limit(5)
+            ->limit($no)
             ->get();
 
             return TopResource::collection($data);
@@ -480,39 +482,4 @@ class InsightController extends Controller
 
     }
 
-    public function toplawyer(Request $request){
-
-        $id = $request->input('id');
-        $from = $request->input('from');
-        $to = $request->input('to');
-        $date = Carbon::now()->format( 'Y-m-d' );
-        $type = $request->input('selected');
-        $month = ($request->input('month') == '') ? date('m') : $request->input('month');
-        $year = ($request->input('year') == '') ? date('Y') : $request->input('year');
-
-
-        $query = Appointment::query();
-        $query->where('status', 'Finished')->where('legalpractice_id',$id);
-        if($type == 'Daily'){
-            ($from != '') ? $d = $from : $d = date('Y-m-d');
-            $query = $query->whereDate('created_at',$d);
-        }else if($type == 'Monthly'){
-            $query = $query->whereMonth('created_at',$month);
-        }else if($type == 'Anually'){
-            $query->whereYear('created_at',$year);
-        }else{
-            $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
-        }
-        $ids = $query->pluck('id');
-        
-
-        $prods6 =  LawyerAppointment::whereIn('appointment_id',$ids)->select('lawyer_id',\DB::raw("count(*) as count"))
-        ->groupBy('lawyer_id')
-        ->orderBy('count','DESC')
-        ->limit(1)
-        ->get();
-
-        return $prods6 = (!empty($prods6[0])) ? $prods6[0]->lawyer->profile->firstname.' '.$prods6[0]->lawyer->profile->lastname : 'None';
-
-    }   
 }

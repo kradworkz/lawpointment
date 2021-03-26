@@ -8,6 +8,14 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="custom-form">
+                                        <select  @click="type" v-model="sortby" placeholder="Summary">
+                                            <option value="created_at">By Date</option>
+                                            <option value="client_id">By Client</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="custom-form">
                                         <select @click="type" v-model="status">
                                             <option value="All">All</option>
                                             <option value="Pending">Pending</option>
@@ -24,12 +32,19 @@
                                         </select>
                                     </div>
                                 </div>
-                                
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                    <button class="btn btn-primary" @click="generateReport" style="float: right;">Print</button>
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-md-3">
+                                    <div class="custom-form">
+                                        <select  @click="type" v-model="sort" placeholder="Summary">
+                                            <option value="ASC">Ascending</option>
+                                            <option value="DESC">Descending</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-md-3">
                                     <div class="custom-form">
                                         <select  @click="type" v-model="selected" placeholder="Summary">
@@ -143,7 +158,9 @@ export default {
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             from: '',
             to: '',
-             today:new Date().toISOString().slice(0, 10)
+            today:new Date().toISOString().slice(0, 10),
+            sort: 'DESC',
+            sortby: 'created_at'
         }
     },
 
@@ -185,7 +202,9 @@ export default {
                 status: this.status,
                 lawyer: this.lawyer,
                 from : this.from,
-                to: this.to
+                to: this.to,
+                sort: this.sort,
+                sortby: this.sortby
             })
             .then(response => {
                 this.appointments = response.data.data;

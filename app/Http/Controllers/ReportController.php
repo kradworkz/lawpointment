@@ -332,6 +332,8 @@ class ReportController extends Controller
             $status = $request->input('status');
             $from = $request->input('from');
             $to = $request->input('to');
+            $sort = $request->input('sort');
+            $sortby = $request->input('sortby');
 
             if($lawyer != ''){
                 $ids = Appointment::whereHas('lawyers',function($query) use ($lawyer) {
@@ -342,22 +344,23 @@ class ReportController extends Controller
             $query = Appointment::query();
             ($status == 'All') ? '' : $query->where('status', $status);
             ($lawyer == '') ? '' : $query->whereIn('id', $ids);
-            
+            ($sortby == 'client_id') ? $query = $query->join('users','appointments.client_id','=','users.id')
+            ->join('profiles','users.id','=','profiles.user_id')->orderBy('profiles.lastname',$sort) : '';
             if($type == 'Daily'){
                 ($from != '') ? $d = $from : $d = date('Y-m-d');
-                $query = $query->whereDate('created_at',$d);
+                $query = $query->whereDate('appointments.created_at',$d);
                 
             }else if($type == 'Weekly'){
-                $query =  $query->whereBetween('created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
+                $query =  $query->whereBetween('appointments.created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
             }else if($type == 'Monthly'){
-                $query = $query->whereMonth('created_at',$month);
+                $query = $query->whereMonth('appointments.created_at',$month);
             }else if($type == 'Anually'){
-                $query->whereYear('created_at',$year);
+                $query->whereYear('appointments.created_at',$year);
             }else{
-                $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
+                $query->whereBetween('appointments.created_at',[$from.' 00:00:00',$to.' 23:59:59']);
             }
             
-            $query = $query->orderBy('client_id');
+            ($sortby != 'client_id') ? $query = $query->orderBy($sortby,$sort) : '';
             $data = $query->get();
             
     

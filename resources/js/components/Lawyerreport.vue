@@ -7,6 +7,16 @@
                         <div class="col-md-12">
                            
                             <div class="row">
+                                <div class="col-md-1">
+                                    <div class="custom-form">
+                                        <select v-model="no" placeholder="Summary">
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="15">15</option>
+                                            <option value="20">20</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-md-3">
                                     <div class="custom-form">
                                         <select  v-model="selected" placeholder="Summary">
@@ -63,14 +73,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                 <div class="col-md-6">
+                                <div class="col-md-5">
                                    <button class="btn btn-primary" @click="generateReport" style="float: right;">Print</button>
                                 </div>
                             </div>
                             <div ref="html2Pdf" style="padding: 40px;">
                                 
                                 <div class="row">
-                                    <h5>Top 5 Lawyers (<span v-if="selected == 'Daily'">{{ (from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span><span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                    <h5>Top {{no}} Lawyers (<span v-if="selected == 'Daily'">{{ (from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span><span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                     <table class="table table-striped" style="min-width: 100%;">
                                         <thead>
                                             <tr>
@@ -94,7 +104,7 @@
                                 </div>
     <br><br>
                                 <div class="row">
-                                    <h5>Top 5 Legal Practice (<span v-if="selected == 'Daily'">{{(from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
+                                    <h5>Top {{no}} Legal Practice (<span v-if="selected == 'Daily'">{{(from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                     <table class="table table-striped" style="min-width: 100%;">
                                         <thead>
                                             <tr>
@@ -144,7 +154,8 @@ export default {
             month:("0" + ((new Date()).getMonth() + 1)).slice(-2),
             yearr: new Date().getFullYear(),
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-             today:new Date().toISOString().slice(0, 10)
+             today:new Date().toISOString().slice(0, 10),
+             no : 5
         }
     },
 
@@ -168,6 +179,10 @@ export default {
         },
 
         yearr: function(){
+            this.type();
+        },
+
+        no: function(){
             this.type();
         },
 
@@ -206,7 +221,8 @@ export default {
                 month: this.month,
                 year: this.yearr,
                 from: this.from,
-                to: this.to
+                to: this.to,
+                no: this.no
             })
             .then(response => {
                 this.lawyers = response.data.data;
