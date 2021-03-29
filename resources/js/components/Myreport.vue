@@ -27,7 +27,15 @@
                             <div class="box_general">
                                    
                                     <div class="row">
-                                         <div class="col-md-2">
+                                        <div class="col-md-2">
+                                            <div class="custom-form">
+                                                <select class="form-control" @click="type" v-model="sortby" placeholder="Summary">
+                                                    <option value="Booking">Booking Date</option>
+                                                    <option value="Schedule">Schedule Date</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
                                             <div class="custom-form">
                                                 <select class="form-control" @click="type" v-model="status" placeholder="Summary">
                                                     <option value="All">All</option>
@@ -89,7 +97,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-2">
                                             <button  class="btn btn-primary" @click="generateReport" style="float: right;">Print</button>
                                         </div>
                                     </div><br>
@@ -151,7 +159,8 @@ export default {
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             from: '',
             to: '',
-              today:new Date().toISOString().slice(0, 10)
+              today:new Date().toISOString().slice(0, 10),
+              sortby: 'Booking'
         }
     },
 
@@ -182,7 +191,8 @@ export default {
                 year: this.yearr,
                 status: this.status,
                 from: this.from,
-                to: this.to
+                to: this.to,
+                sortby: this.sortby
             })
             .then(response => {
                 this.appointments = response.data.data;

@@ -20,6 +20,7 @@ class ReportController extends Controller
         $from = $request->input('from');
         $to = $request->input('to');
         $status = $request->input('status');
+        $sortby = $request->input('sortby');
 
         if(Auth::user()->type == 'Lawyer'){
             $ids = Appointment::whereHas('lawyers',function($query) {
@@ -32,18 +33,42 @@ class ReportController extends Controller
         $query = Appointment::query();
         $query = $query->whereIn('id',$ids);
         ($status == 'All') ? '' : $query = $query->where('status',$status);
-        
-        if($type == 'Daily'){
-            $query =($from != '') ?  $query->whereDate('created_at',$from) : $query->whereDate('created_at',date('Y-m-d'));
+        if($sortby == 'Booking'){
+            if($type == 'Daily'){
+                $query =($from != '') ?  $query->whereDate('created_at',$from) : $query->whereDate('created_at',date('Y-m-d'));
 
-        }else if($type == 'Weekly'){
-            $query =  $query->whereBetween('created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
-        }else if($type == 'Monthly'){
-            $query = $query->whereMonth('created_at',$month);
-        }else if($type == 'Anually'){
-            $query = $query->whereYear('created_at',$year);
+            }else if($type == 'Weekly'){
+                $query =  $query->whereBetween('created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
+            }else if($type == 'Monthly'){
+                $query = $query->whereMonth('created_at',$month);
+            }else if($type == 'Anually'){
+                $query = $query->whereYear('created_at',$year);
+            }else{
+                $query = $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
+            }
         }else{
-            $query = $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
+            if($type == 'Daily'){
+                ($from != '') ? $d = $from : $d = date('Y-m-d');
+                $query =$query->whereHas('schedules',function($query) use ($d,$status) {
+                    return $query->whereDate('date',$d);
+                    ($status != 'All') ? $query->where('status',$status) : '';
+                 });
+            }else if($type == 'Monthly'){
+                $query =$query->whereHas('schedules',function($query) use ($month,$status) {
+                    return $query->whereMonth('date',$month);
+                     ($status != 'All') ? $query->where('status',$status) : '';
+                 });
+            }else if($type == 'Anually'){
+                $query =$query->whereHas('schedules',function($query) use ($year,$status) {
+                    return $query->whereYear('date',$year);
+                     ($status != 'All') ? $query->where('status',$status) : '';
+                 });
+            }else{
+                $query =$query->whereHas('schedules',function($query) use ($from,$to,$status) {
+                    return $query->whereBetween('date',[$from.' 00:00:00',$to.' 23:59:59']);
+                     ($status != 'All') ? $query->where('status',$status) : '';
+                 });
+            }
         }
 
         $data = $query->get();
@@ -334,6 +359,7 @@ class ReportController extends Controller
             $to = $request->input('to');
             $sort = $request->input('sort');
             $sortby = $request->input('sortby');
+            $sorttype = $request->input('sorttype');
 
             if($lawyer != ''){
                 $ids = Appointment::whereHas('lawyers',function($query) use ($lawyer) {
@@ -346,22 +372,58 @@ class ReportController extends Controller
             ($lawyer == '') ? '' : $query->whereIn('id', $ids);
             ($sortby == 'client_id') ? $query = $query->join('users','appointments.client_id','=','users.id')
             ->join('profiles','users.id','=','profiles.user_id')->orderBy('profiles.lastname',$sort) : '';
-            if($type == 'Daily'){
-                ($from != '') ? $d = $from : $d = date('Y-m-d');
-                $query = $query->whereDate('appointments.created_at',$d);
-                
-            }else if($type == 'Weekly'){
-                $query =  $query->whereBetween('appointments.created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
-            }else if($type == 'Monthly'){
-                $query = $query->whereMonth('appointments.created_at',$month);
-            }else if($type == 'Anually'){
-                $query->whereYear('appointments.created_at',$year);
-            }else{
-                $query->whereBetween('appointments.created_at',[$from.' 00:00:00',$to.' 23:59:59']);
+            if($sorttype == 'Booking'){
+                if($type == 'Daily'){
+                    ($from != '') ? $d = $from : $d = date('Y-m-d');
+                    $query = $query->whereDate('appointments.created_at',$d);
+                    
+                }else if($type == 'Weekly'){
+                    $query =  $query->whereBetween('appointments.created_at', [Carbon::parse('last monday')->startOfDay(),Carbon::parse('next friday')->endOfDay()]);
+                }else if($type == 'Monthly'){
+                    $query = $query->whereMonth('appointments.created_at',$month);
+                }else if($type == 'Anually'){
+                    $query->whereYear('appointments.created_at',$year);
+                }else{
+                    ($from == '') ? Carbon::parse('last monday')->startOfDay() : $from;
+                    ($to == '') ?  Carbon::parse('next friday')->endOfDay() : $to;
+                    $query->whereBetween('appointments.created_at',[$from.' 00:00:00',$to.' 23:59:59']);
+                }
             }
             
             ($sortby != 'client_id') ? $query = $query->orderBy($sortby,$sort) : '';
-            $data = $query->get();
+            $ids = $query->pluck('id');
+
+            if($sorttype == 'Schedule'){
+                ($from != '') ? $d = $from : $d = date('Y-m-d');
+                $ids = Appointment::whereHas('schedules',function($query) use ($type,$from,$to,$status,$d,$year,$month) {
+ 
+                    ($type == 'Daily') ? $query = $query->whereDate('date',$d) : '';
+                    ($type == 'Monthly') ?  $query =$query->whereMonth('date',$month) : '';
+                    ($type == 'Anually') ?  $query = $query->whereYear('date',$year) : '';
+                    ($type == 'Date Range') ?  $query = $query->whereBetween('date',[$from.' 00:00:00',$to.' 23:59:59']) : '';
+                    return $query;
+                    ($status != 'All') ? $query->where('status',$status) : '';
+                })->pluck('id');
+
+                if($lawyer != ''){
+                    $ids2 = Appointment::whereHas('lawyers',function($query) use ($lawyer) {
+                        return $query->where('lawyer_id', $lawyer);
+                    })->pluck('id');
+                } 
+    
+
+                $query = Appointment::query();
+                $query->whereIn('id',$ids);
+                ($status == 'All') ? '' : $query->where('status', $status);
+                ($lawyer == '') ? '' : $query->whereIn('id', $ids2);
+                ($sortby == 'client_id') ? $query = $query->join('users','appointments.client_id','=','users.id')
+                ->join('profiles','users.id','=','profiles.user_id')->orderBy('profiles.lastname',$sort) : '';
+                ($sortby != 'client_id') ? $query = $query->orderBy($sortby,$sort) : '';
+                $data = $query->paginate(5);
+    
+            }else{
+                $data = Appointment::whereIn('id',$ids)->paginate(5);
+            }
             
     
             return ReportResource::collection($data);

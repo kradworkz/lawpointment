@@ -42,6 +42,7 @@ class AppointmentController extends Controller
         $status = $request->input('status');
         $to = ($request->input('to') == '') ? '' : Carbon::parse($request->input('to'))->startOfDay(); 
         $from =($request->input('from') == '') ? '' : Carbon::parse($request->input('from'))->startOfDay();
+        $sortby = $request->input('sortby');
 
         $ids = Profile::where(\DB::raw('concat(firstname," ",lastname)'),'LIKE', '%'.$keyword.'%')->pluck('user_id');
 
@@ -66,8 +67,13 @@ class AppointmentController extends Controller
             }
         }
 
-        if($from != '' && $to != ''){
+        if($from != '' && $to != '' && $sortby == 'Booking'){
             $apps = Appointment::whereIn('id',$data)->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->paginate(5);
+        }else if($from != '' && $to != '' && $sortby == 'Schedule'){
+            $apps = Appointment::whereIn('id',$data)->whereHas('schedules',function($query) use ($from,$to,$status) {
+                return $query->whereBetween('date',[$from.' 00:00:00',$to.' 23:59:59']);
+                ($status != 'All') ? $query->where('status',$status) : '';
+            })->paginate(5);
         }else{
             $apps = Appointment::whereIn('id',$data)->paginate(5);
         }
@@ -306,6 +312,8 @@ class AppointmentController extends Controller
         $status = ($request->input('status') == 'All') ? 'All' : $request->input('status');
         $to = ($request->input('to') == '') ? '' : $request->input('to'); 
         $from =($request->input('from') == '') ? '' : $request->input('from');
+        $sortby = $request->input('sortby');
+
         
         $user_id = Auth::user()->id;
 
@@ -313,22 +321,33 @@ class AppointmentController extends Controller
         // $data = Appointment::where('client_id',$user_id)->where('title', 'LIKE', '%'.$keyword.'%')->where('status',$status)->paginate(5);
         $ids = Profile::where(\DB::raw('concat(firstname," ",lastname)'),'LIKE', '%'.$keyword.'%')->pluck('user_id');
 
-        $data =  LawyerAppointment::where('lawyer_id',$user_id)->orderBy('id','DESC')
+        $data =  LawyerAppointment::where('lawyer_id',$user_id)
         ->whereHas('appointment',function($query) use ($ids) {
             return $query->whereIn('client_id',$ids);
         })
         ->pluck('appointment_id');
 
-        if($from != '' && $to != ''){
+        if($sortby == 'Booking'){
 
-            $query = Appointment::query();
-            ($status == 'All') ? '' : $query->where('status', $status);
-            $apps = $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59'])->paginate(8);
+            if($from != '' && $to != ''){
+                $query = Appointment::query();
+                ($status == 'All') ? '' : $query->where('status', $status);
+                $query->whereBetween('created_at',[$from.' 00:00:00',$to.' 23:59:59']);
+                $apps = $query->whereIn('id',$data)->paginate(8);
+            }else{
+                $query = Appointment::query();
+                ($status == 'All') ? '' : $query->where('status', $status);
+                $apps = $query->whereIn('id',$data)->paginate(8);
+            }
 
         }else{
-            $query = Appointment::query();
-            ($status == 'All') ? '' : $query->where('status', $status);
-            $apps = $query->whereIn('id',$data)->paginate(8);
+            $query1 = Appointment::query();
+            $query1->whereHas('schedules',function($query) use ($from,$to,$status) {
+               return $query->whereBetween('date',[$from.' 00:00:00',$to.' 23:59:59']);
+                ($status != 'All') ? $query->where('status',$status) : '';
+            });
+            ($status == 'All') ? '' : $query1->where('status', $status);
+            $apps = $query1->whereIn('id',$data)->paginate(8);
         }
         return AResource::collection($apps);
     }

@@ -16,6 +16,14 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="custom-form">
+                                        <select @click="type" v-model="sorttype">
+                                            <option value="Booking">Booking Date</option>
+                                            <option value="Schedule">Schedule Date</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                 <div class="col-md-3">
+                                    <div class="custom-form">
                                         <select @click="type" v-model="status">
                                             <option value="All">All</option>
                                             <option value="Pending">Pending</option>
@@ -24,16 +32,13 @@
                                         </select>
                                     </div>
                                 </div>
-                                 <div class="col-md-3">
+                                <div class="col-md-3">
                                     <div class="custom-form">
                                         <select @click="type" v-model="lawyer" placeholder="Summary">
                                             <option value="" disabled selected hidden>Select a Lawyer</option>
                                             <option v-for="lawyer in lawyers" v-bind:key="lawyer.id" v-bind:value="lawyer.id">{{lawyer.firstname}} {{lawyer.lastname}}</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-3">
-                                   <button class="btn btn-primary" @click="generateReport" style="float: right;">Print</button>
                                 </div>
                             </div>
                             <div class="row">
@@ -101,6 +106,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-3">
+                                     <button class="btn btn-primary" @click="generateReport" style="float: right;">Print</button>
+                                </div>
                             </div>
                            
                             <div class="col-md-12" ref="html2Pdf" style="padding: 40px;">
@@ -160,7 +168,8 @@ export default {
             to: '',
             today:new Date().toISOString().slice(0, 10),
             sort: 'DESC',
-            sortby: 'created_at'
+            sortby: 'created_at',
+            sorttype: 'Booking'
         }
     },
 
@@ -204,7 +213,8 @@ export default {
                 from : this.from,
                 to: this.to,
                 sort: this.sort,
-                sortby: this.sortby
+                sortby: this.sortby,
+                sorttype: this.sorttype
             })
             .then(response => {
                 this.appointments = response.data.data;

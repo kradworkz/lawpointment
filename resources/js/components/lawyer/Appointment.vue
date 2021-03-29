@@ -14,10 +14,9 @@
             <div class="container">
 
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <h6 style="font-size: 12px; font-size: .75rem; color: #999;">Search</h6>
                         <div class="search_bar_list">
-                            <input type="submit" value="Search">
                             <input type="text" @keyup="search" v-model="keyword" class="form-control"
                                 placeholder="Enter Client">
                         </div>
@@ -34,9 +33,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <h6 style="font-size: 12px; font-size: .75rem; color: #999; margin-left: 80%;">Sort by</h6>
+                    <div class="col-md-2">
+                        <h6 style="font-size: 12px; font-size: .75rem; color: #999; ">Sort by status</h6>
                         <multiselect v-model="selected" :options="options" :show-labels="false"
+                            placeholder="Pick a status" @input="onChange"></multiselect>
+                    </div>
+                    <div class="col-md-2">
+                        <h6 style="font-size: 12px; font-size: .75rem; color: #999;">Sort by date</h6>
+                        <multiselect v-model="sortby" :options="options2" :show-labels="false"
                             placeholder="Pick a status" @input="onChange"></multiselect>
                     </div>
                 </div>
@@ -437,6 +441,7 @@
                 viewapp: {},
                 selected: 'All',
                 options: ['All','Pending', 'Accepted', 'Finished', 'Cancelled'],
+                options2: ['Booking','Schedule'],
                 keyword: '',
                 viewappointment: false,
                 disabledDates: {
@@ -464,7 +469,8 @@
                 n : false,
                 f: false,
                 from: '',
-                to: ''
+                to: '',
+                sortby: 'Booking'
             }
         },
 
@@ -549,7 +555,8 @@
                     word: this.keyword,
                     status: this.selected,
                     from: this.from,
-                    to: this.to
+                    to: this.to,
+                    sortby: this.sortby
                 })
                 .then(response => {
                     this.appointments = response.data.data;

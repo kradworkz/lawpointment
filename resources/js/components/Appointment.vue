@@ -61,19 +61,27 @@
                             </div>
                             <div class="col-md-8">
                                 <div class="row">
-                                    <div class="col-md-5">
+                                    <div class="col-md-3">
                                         <div class="custom-form no-icons">
                                             <input type="date" v-model="from" placeholder="Date Example : 09/12/2019"
                                                 class="form-control fill">
                                         </div>
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-md-3">
                                         <div class="custom-form no-icons">
                                             <input type="date" v-model="to" placeholder="Date Example : 09/12/2019"
                                                 class="form-control fill">
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
+                                        <div class="custom-form no-icons">
+                                             <select @click="search" v-model="sortby" placeholder="Summary">
+                                            <option value="Booking">Booking Date</option>
+                                            <option value="Schedule">Schedule Date</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
                                         <multiselect v-model="status" :options="options" placeholder="Select Status"
                                             :show-labels="false" @input="onChange">
                                         </multiselect>
@@ -399,7 +407,8 @@
                 notes: [],
                 files: [],
                 n : false,
-                f : false
+                f : false,
+                sortby: 'Booking'
             }
         },
 
@@ -548,7 +557,8 @@
                         type: this.type,
                         from: this.from,
                         to: this.to,
-                        status: this.status
+                        status: this.status,
+                        sortby: this.sortby
                     })
                     .then(response => {
                         this.appointments = response.data.data;;
