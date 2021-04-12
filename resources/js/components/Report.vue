@@ -36,7 +36,7 @@
                                     <div class="custom-form">
                                         <select @click="type" v-model="lawyer" placeholder="Summary">
                                             <option value="" disabled selected hidden>Select a Lawyer</option>
-                                            <option v-for="lawyer in lawyers" v-bind:key="lawyer.id" v-bind:value="lawyer.id">{{lawyer.firstname}} {{lawyer.lastname}}</option>
+                                            <option v-for="lawyer in lawyers" v-bind:key="lawyer.id" v-bind:value="lawyer">{{lawyer.firstname}} {{lawyer.lastname}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -112,7 +112,16 @@
                             </div>
                            
                             <div class="col-md-12" ref="html2Pdf" style="padding: 40px;">
-                                <h5>List of Appointments  (<span v-if="selected == 'Daily'">{{ (from == '') ? today : from }}</span> <span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5><br>
+                                <div class="col-md-12">
+                                    <center><p style="font-size: 25px;">Castillo and Climaco Law Office</p></center>
+                                    <center><p style="font-size: 14px; margin-top: -15px;">Mendoza Building, Pilar St., Zamboanga City</p></center>
+                                    <span>APPOINTMENT REPORTS</span>
+                                    <img style="float: right;" class="img-fluid" :src="currentUrl+'/assets/images/logo.png'" alt="Lawpointment" />
+                                    <hr>
+                                </div>
+                                <h5>List of Appointments  (<span v-if="selected == 'Daily'">{{ (from == '') ? today : from }}</span> <span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>) 
+                                <span style="float: right; margin-left: 35px;">Lawyer : {{ (lawyer == '') ? 'All' : lawyer.firstname+' '+lawyer.lastname  }}</span> <span style="float: right;">Status : {{status}}</span></h5><br>
+                               
                                 <table class="table table-striped" style="min-width: 100%; ">
                                     <thead>
                                         <tr>
@@ -209,7 +218,7 @@ export default {
                 month: this.month,
                 year: this.yearr,
                 status: this.status,
-                lawyer: this.lawyer,
+                lawyer: this.lawyer.id,
                 from : this.from,
                 to: this.to,
                 sort: this.sort,

@@ -369,7 +369,7 @@ class ReportController extends Controller
 
             $query = Appointment::query();
             ($status == 'All') ? '' : $query->where('status', $status);
-            ($lawyer == '') ? '' : $query->whereIn('id', $ids);
+            ($lawyer == '') ? '' : $query->whereIn('appointments.id', $ids);
             ($sortby == 'client_id') ? $query = $query->join('users','appointments.client_id','=','users.id')
             ->join('profiles','users.id','=','profiles.user_id')->orderBy('profiles.lastname',$sort) : '';
             if($sorttype == 'Booking'){
@@ -391,7 +391,7 @@ class ReportController extends Controller
             }
             
             ($sortby != 'client_id') ? $query = $query->orderBy($sortby,$sort) : '';
-            $ids = $query->pluck('id');
+            $ids = $query->pluck('appointments.id');
 
             if($sorttype == 'Schedule'){
                 ($from != '') ? $d = $from : $d = date('Y-m-d');
@@ -413,16 +413,16 @@ class ReportController extends Controller
     
 
                 $query = Appointment::query();
-                $query->whereIn('id',$ids);
+                $query->whereIn('appointments.id',$ids);
                 ($status == 'All') ? '' : $query->where('status', $status);
-                ($lawyer == '') ? '' : $query->whereIn('id', $ids2);
+                ($lawyer == '') ? '' : $query->whereIn('appointments.id', $ids2);
                 ($sortby == 'client_id') ? $query = $query->join('users','appointments.client_id','=','users.id')
                 ->join('profiles','users.id','=','profiles.user_id')->orderBy('profiles.lastname',$sort) : '';
                 ($sortby != 'client_id') ? $query = $query->orderBy($sortby,$sort) : '';
-                $data = $query->paginate(5);
+                $data = $query->get();
     
             }else{
-                $data = Appointment::whereIn('id',$ids)->paginate(5);
+                $data = Appointment::whereIn('id',$ids)->get();
             }
             
     
