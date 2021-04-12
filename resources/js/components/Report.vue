@@ -7,7 +7,8 @@
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <div class="custom-form">
+                                    <div class="custom-form no-icons">
+                                        <label class="float-label" style="font-size: 12px;">Sort by Date</label>
                                         <select  @click="type" v-model="sortby" placeholder="Summary">
                                             <option value="created_at">By Date</option>
                                             <option value="client_id">By Client</option>
@@ -16,6 +17,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="custom-form">
+                                         <label class="float-label" style="font-size: 12px;">Filter by Date</label> 
                                         <select @click="type" v-model="sorttype">
                                             <option value="Booking">Booking Date</option>
                                             <option value="Schedule">Schedule Date</option>
@@ -24,6 +26,7 @@
                                 </div>
                                  <div class="col-md-3">
                                     <div class="custom-form">
+                                        <label class="float-label" style="font-size: 12px;">Filter by Status</label> 
                                         <select @click="type" v-model="status">
                                             <option value="All">All</option>
                                             <option value="Pending">Pending</option>
@@ -34,6 +37,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="custom-form">
+                                         <label class="float-label" style="font-size: 12px;">Filter by Lawyer</label>
                                         <select @click="type" v-model="lawyer" placeholder="Summary">
                                             <option value="" disabled selected hidden>Select a Lawyer</option>
                                             <option v-for="lawyer in lawyers" v-bind:key="lawyer.id" v-bind:value="lawyer">{{lawyer.firstname}} {{lawyer.lastname}}</option>
@@ -44,6 +48,7 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="custom-form">
+                                         <label class="float-label" style="font-size: 12px;">Sort by</label>
                                         <select  @click="type" v-model="sort" placeholder="Summary">
                                             <option value="ASC">Ascending</option>
                                             <option value="DESC">Descending</option>
@@ -52,6 +57,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="custom-form">
+                                         <label class="float-label" style="font-size: 12px;">Filter by</label>
                                         <select  @click="type" v-model="selected" placeholder="Summary">
                                             <option value="Daily">Daily</option>
                                             <!-- <option value="Weekly">Weekly</option> -->
@@ -62,8 +68,9 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="custom-form">
+                                    <div class="custom-form"> <label class="float-label" style="font-size: 12px;">Sort by Date</label>
                                         <div class="custom-form">
+                                            
                                             <select v-if="selected == 'Monthly'" @click="type" v-model="month" placeholder="Summary">
                                                 <option value="01">January</option>
                                                 <option value="02">February</option>
@@ -113,9 +120,9 @@
                            
                             <div class="col-md-12" ref="html2Pdf" style="padding: 40px;">
                                 <div class="col-md-12">
-                                    <center><p style="font-size: 25px;">Castillo and Climaco Law Office</p></center>
+                                    <center><p style="font-size: 32px;">Castillo and Climaco Law Office</p></center>
                                     <center><p style="font-size: 14px; margin-top: -15px;">Mendoza Building, Pilar St., Zamboanga City</p></center>
-                                    <span>APPOINTMENT REPORTS</span>
+                                    <span style="font-size: 20px;">APPOINTMENT REPORTS</span>
                                     <img style="float: right;" class="img-fluid" :src="currentUrl+'/assets/images/logo.png'" alt="Lawpointment" />
                                     <hr>
                                 </div>
