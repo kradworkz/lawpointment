@@ -9,6 +9,7 @@
                             <div class="row">
                                 <div class="col-md-1">
                                     <div class="custom-form">
+                                        <label class="float-label" style="font-size: 12px;">List of top</label>
                                         <select v-model="no" placeholder="Summary">
                                             <option value="5">5</option>
                                             <option value="10">10</option>
@@ -19,6 +20,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="custom-form">
+                                        <label class="float-label" style="font-size: 12px;">Filter by Date</label>
                                         <select  v-model="selected" placeholder="Summary">
                                             <option value="Daily">Daily</option>
                                             <!-- <option value="Weekly">Weekly</option> -->
@@ -30,7 +32,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="custom-form">
-                                        <div class="custom-form">
+                                        <div class="custom-form" style="margin-top: 17px;">
                                             <select v-if="selected == 'Monthly'" v-model="month" placeholder="Summary">
                                                 <option value="01">January</option>
                                                 <option value="02">February</option>
@@ -80,6 +82,13 @@
                             <div ref="html2Pdf" style="padding: 40px;">
                                 
                                 <div class="row">
+                                    <div class="col-md-12" style="margin-bottom: 25px;">
+                                        <center><p style="font-size: 32px;">Castillo and Climaco Law Office</p></center>
+                                        <center><p style="font-size: 14px; margin-top: -15px;">Mendoza Building, Pilar St., Zamboanga City</p></center>
+                                        <span style="font-size: 20px;">APPOINTMENT REPORTS</span>
+                                        <img style="float: right;" class="img-fluid" :src="currentUrl+'/assets/images/logo2.png'" alt="Lawpointment" />
+                                        <hr>
+                                    </div>
                                     <h5>Top {{no}} Lawyers (<span v-if="selected == 'Daily'">{{ (from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span><span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>
                                     <table class="table table-striped" style="min-width: 100%;">
                                         <thead>

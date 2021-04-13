@@ -5,59 +5,18 @@
                 <div class="card">
                     <div class="card-block email-card">
                         <div class="col-md-12">
+                            <p>Filter By: </p>
                             <div class="row">
-                                <div class="col-md-3">
-                                    <div class="custom-form no-icons">
-                                        <label class="float-label" style="font-size: 12px;">Sort by Date</label>
-                                        <select  @click="type" v-model="sortby" placeholder="Summary">
-                                            <option value="created_at">By Date</option>
-                                            <option value="client_id">By Client</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="custom-form">
-                                         <label class="float-label" style="font-size: 12px;">Filter by Date</label> 
                                         <select @click="type" v-model="sorttype">
                                             <option value="Booking">Booking Date</option>
                                             <option value="Schedule">Schedule Date</option>
                                         </select>
                                     </div>
                                 </div>
-                                 <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="custom-form">
-                                        <label class="float-label" style="font-size: 12px;">Filter by Status</label> 
-                                        <select @click="type" v-model="status">
-                                            <option value="All">All</option>
-                                            <option value="Pending">Pending</option>
-                                            <option value="Accepted">Accepted</option>
-                                            <option value="Finished">Finished</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="custom-form">
-                                         <label class="float-label" style="font-size: 12px;">Filter by Lawyer</label>
-                                        <select @click="type" v-model="lawyer" placeholder="Summary">
-                                            <option value="" disabled selected hidden>Select a Lawyer</option>
-                                            <option v-for="lawyer in lawyers" v-bind:key="lawyer.id" v-bind:value="lawyer">{{lawyer.firstname}} {{lawyer.lastname}}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="custom-form">
-                                         <label class="float-label" style="font-size: 12px;">Sort by</label>
-                                        <select  @click="type" v-model="sort" placeholder="Summary">
-                                            <option value="ASC">Ascending</option>
-                                            <option value="DESC">Descending</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="custom-form">
-                                         <label class="float-label" style="font-size: 12px;">Filter by</label>
                                         <select  @click="type" v-model="selected" placeholder="Summary">
                                             <option value="Daily">Daily</option>
                                             <!-- <option value="Weekly">Weekly</option> -->
@@ -67,10 +26,9 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="custom-form"> <label class="float-label" style="font-size: 12px;">Sort by Date</label>
+                                <div class="col-md-2">
+                                    <div class="custom-form"> 
                                         <div class="custom-form">
-                                            
                                             <select v-if="selected == 'Monthly'" @click="type" v-model="month" placeholder="Summary">
                                                 <option value="01">January</option>
                                                 <option value="02">February</option>
@@ -85,7 +43,6 @@
                                                 <option value="11">November</option>
                                                 <option value="12">December</option>
                                             </select>
-
                                             <select v-if="selected == 'Anually'" @click="type" v-model="yearr" placeholder="Summary">
                                                 <option value="2021">2021</option>
                                                 <option value="2022">2022</option>
@@ -113,20 +70,65 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                     <button class="btn btn-primary" @click="generateReport" style="float: right;">Print</button>
+                                
+                                <div class="col-md-2"></div>
+                                <div class="col-md-2" style="margin-top: -25px;">
+                                    <div class="custom-form">
+                                        <label class="float-label" style="font-size: 12px;">Filter by Status</label> 
+                                        <select @click="type" v-model="status">
+                                            <option value="All">All</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Accepted">Accepted</option>
+                                            <option value="Finished">Finished</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="margin-top: -25px;">
+                                    <div class="custom-form">
+                                         <label class="float-label" style="font-size: 12px;">Filter by Lawyer</label>
+                                        <select @click="type" v-model="lawyer" placeholder="Summary">
+                                            <option value="" disabled selected hidden>Select a Lawyer</option>
+                                            <option @click="lawyer = ''">All</option>
+                                            <option v-for="lawyer in lawyers" v-bind:key="lawyer.id" v-bind:value="lawyer">{{lawyer.firstname}} {{lawyer.lastname}}</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                           
+                        </div>
+                        <div class="col-md-12">
+                            <div class="row">
+                                 <div class="col-md-8"></div>
+                                <div class="col-md-2">
+                                    <div class="custom-form no-icons">
+                                        <label class="float-label" style="font-size: 12px;">Sort by Date</label>
+                                        <select  @click="type" v-model="sortby" placeholder="Summary">
+                                            <option value="created_at">By Date</option>
+                                            <option value="client_id">By Client</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="custom-form">
+                                         <label class="float-label" style="font-size: 12px;">Filter by Date</label> 
+                                        <select @click="type" v-model="sorttype">
+                                            <option value="Booking">Booking Date</option>
+                                            <option value="Schedule">Schedule Date</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                                                       
                             <div class="col-md-12" ref="html2Pdf" style="padding: 40px;">
                                 <div class="col-md-12">
                                     <center><p style="font-size: 32px;">Castillo and Climaco Law Office</p></center>
                                     <center><p style="font-size: 14px; margin-top: -15px;">Mendoza Building, Pilar St., Zamboanga City</p></center>
                                     <span style="font-size: 20px;">APPOINTMENT REPORTS</span>
-                                    <img style="float: right;" class="img-fluid" :src="currentUrl+'/assets/images/logo.png'" alt="Lawpointment" />
+                                    <img style="float: right;" class="img-fluid" :src="currentUrl+'/assets/images/logo2.png'" alt="Lawpointment" />
                                     <hr>
                                 </div>
-                                <h5>List of Appointments  (<span v-if="selected == 'Daily'">{{ (from == '') ? today : from }}</span> <span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>) 
+                                <h5>List of Appointments that are {{ (sorttype == 'Booking') ? 'Booked' : 'Scheduled' }} on (<span v-if="selected == 'Daily'">{{ (from == '') ? today : from }}</span> <span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>) 
                                 <span style="float: right; margin-left: 35px;">Lawyer : {{ (lawyer == '') ? 'All' : lawyer.firstname+' '+lawyer.lastname  }}</span> <span style="float: right;">Status : {{status}}</span></h5><br>
                                
                                 <table class="table table-striped" style="min-width: 100%; ">
