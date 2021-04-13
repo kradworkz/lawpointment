@@ -86,7 +86,7 @@
                                         <center><p style="font-size: 32px;">Castillo and Climaco Law Office</p></center>
                                         <center><p style="font-size: 14px; margin-top: -15px;">Mendoza Building, Pilar St., Zamboanga City</p></center>
                                         <span style="font-size: 20px;">APPOINTMENT REPORTS</span>
-                                        <img style="float: right;" class="img-fluid" :src="currentUrl+'/assets/images/logo2.png'" alt="Lawpointment" />
+                                         <img style="float: right; width: 250px; height:70px;  margin-top: -40px;" class="img-fluid" :src="currentUrl+'/assets/images/logo2.png'" alt="Lawpointment" />
                                         <hr>
                                     </div>
                                     <h5>Top {{no}} Lawyers (<span v-if="selected == 'Daily'">{{ (from != '') ? from : today}}</span><span v-if="selected == 'Date Range'">{{from}} to {{to}}</span><span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>)</h5>

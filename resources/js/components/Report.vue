@@ -71,7 +71,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-md-2"></div>
+                                <div class="col-md-1"></div>
                                 <div class="col-md-2" style="margin-top: -25px;">
                                     <div class="custom-form">
                                         <label class="float-label" style="font-size: 12px;">Filter by Status</label> 
@@ -93,11 +93,14 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-md-1" style="margin-top: -10px;">
+                                     <button class="btn btn-primary" @click="generateReport">Print</button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="row">
-                                 <div class="col-md-8"></div>
+                            <div class="row" style="margin-top: -20px;">
+                                 <div class="col-md-7"></div>
                                 <div class="col-md-2">
                                     <div class="custom-form no-icons">
                                         <label class="float-label" style="font-size: 12px;">Sort by Date</label>
@@ -109,13 +112,14 @@
                                 </div>
                                 <div class="col-md-2">
                                     <div class="custom-form">
-                                         <label class="float-label" style="font-size: 12px;">Filter by Date</label> 
-                                        <select @click="type" v-model="sorttype">
-                                            <option value="Booking">Booking Date</option>
-                                            <option value="Schedule">Schedule Date</option>
+                                         <label class="float-label" style="font-size: 12px;">Sort by</label>
+                                        <select  @click="type" v-model="sort" placeholder="Summary">
+                                            <option value="ASC">Ascending</option>
+                                            <option value="DESC">Descending</option>
                                         </select>
                                     </div>
                                 </div>
+                                 <div class="col-md-1"></div>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -125,7 +129,7 @@
                                     <center><p style="font-size: 32px;">Castillo and Climaco Law Office</p></center>
                                     <center><p style="font-size: 14px; margin-top: -15px;">Mendoza Building, Pilar St., Zamboanga City</p></center>
                                     <span style="font-size: 20px;">APPOINTMENT REPORTS</span>
-                                    <img style="float: right;" class="img-fluid" :src="currentUrl+'/assets/images/logo2.png'" alt="Lawpointment" />
+                                    <img style="float: right; width: 250px; height:70px;  margin-top: -40px;" class="img-fluid" :src="currentUrl+'/assets/images/logo2.png'" alt="Lawpointment" />
                                     <hr>
                                 </div>
                                 <h5>List of Appointments that are {{ (sorttype == 'Booking') ? 'Booked' : 'Scheduled' }} on (<span v-if="selected == 'Daily'">{{ (from == '') ? today : from }}</span> <span v-if="selected == 'Date Range'">{{from}} to {{to}}</span> <span v-if="selected == 'Monthly'"> {{months[month.replace(/^0+/, '')-1]}} - {{yearr}}</span> <span v-if="selected == 'Anually'">{{yearr}}</span>) 
