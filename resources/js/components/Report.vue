@@ -159,6 +159,8 @@
                                         </tr>
                                     </tbody>
                                 </table>
+
+                                <span>Prepared By : {{secre.firstname}} {{secre.lastname}} </span>
                             </div>
                         </div>
 
@@ -179,6 +181,7 @@ export default {
             errors: [],
             pagination: {},
             lawyers: [],
+            secre: [],
             appointments: [],
             status: 'All',
             lawyer: '',
@@ -198,6 +201,7 @@ export default {
      created(){
         this.fetch();
         this.fetchLawyers();
+        this.fetchSecretary();
     },
 
     watch: {
@@ -221,6 +225,14 @@ export default {
             axios.get(this.currentUrl + '/request/user/list/Lawyer')
             .then(response => {
                 this.lawyers = response.data.data;;
+            })
+            .catch(err => console.log(err));
+        },
+
+        fetchSecretary(){
+            axios.get(this.currentUrl + '/request/user/type/admin')
+            .then(response => {
+                this.secre = response.data.data;;
             })
             .catch(err => console.log(err));
         },

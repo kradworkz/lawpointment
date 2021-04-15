@@ -9,6 +9,7 @@ use App\Models\LawyerLegalpractice;
 use Illuminate\Http\Request;
 use App\Http\Requests\LawyerRequest;
 use App\Http\Resources\LawyerResource;
+use App\Http\Resources\AdminResource;
 use Hash;
 
 class UserController extends Controller
@@ -37,6 +38,13 @@ class UserController extends Controller
         $users = User::where('status','Active')->where('id','!=',$id)->where('type',$type)->get();
         return LawyerResource::collection($users);
     }
+
+    public function admin()
+    {   
+        $users = User::where('status','Active')->where('type','Administrator')->first();
+        return new AdminResource($users);
+    }
+
 
 
     public function solo($id)

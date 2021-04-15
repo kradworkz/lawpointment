@@ -132,6 +132,7 @@
                                             </tr>
                                         </tbody>
                                     </table><br>
+                                    <span>Prepared By : {{secre.firstname}} {{secre.lastname}} </span>
                                 </div>
                             </div>
                         </div>
@@ -164,13 +165,15 @@ export default {
             yearr: new Date().getFullYear(),
             months : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
              today:new Date().toISOString().slice(0, 10),
-             no : 5
+             no : 5,
+             secre : []
         }
     },
 
      created(){
         this.fetch();
         this.fetch2();
+        this.fetchSecretary();
     },
 
      watch: {
@@ -204,7 +207,13 @@ export default {
 
   
     methods : {
-
+   fetchSecretary(){
+            axios.get(this.currentUrl + '/request/user/type/admin')
+            .then(response => {
+                this.secre = response.data.data;;
+            })
+            .catch(err => console.log(err));
+        },
         type(){
             this.fetch();
             this.fetch2();

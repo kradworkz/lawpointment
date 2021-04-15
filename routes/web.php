@@ -78,6 +78,7 @@ Route::prefix('request')->group(function () {
     Route::post('/user/search', 'UserController@search');
     Route::put('/user/status', 'UserController@status');
     Route::get('/clientss', 'UserController@clients');
+    Route::get('/user/type/admin', 'UserController@admin');
 
     Route::post('/appointment/setatty', 'AppointmentController@setatty');
     Route::post('/appointment/set', 'AppointmentController@store');
